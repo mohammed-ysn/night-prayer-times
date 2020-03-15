@@ -22,3 +22,11 @@ h2 {
 .dark {
   color: #17252a;
 }
+
+input {
+  border: none;
+  padding: 10px 50px;
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+}
