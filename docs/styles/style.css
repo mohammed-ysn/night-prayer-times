@@ -1,3 +1,15 @@
 body {
   background-color: #3aafa9;
 }
+
+.white {
+  color: #feffff;
+}
+
+.black {
+  color: #17252a;
+}
+
+#main-heading {
+  text-align: center;
+}
