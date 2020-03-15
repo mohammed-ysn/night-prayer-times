@@ -10,12 +10,13 @@ body {
 }
 
 h1 {
-  font-size: 60px;
+  font-size: 3em;
   text-align: center;
   font-weight: 900;
 }
 
-h2 {
+label {
+  font-size: 1.5em;
   font-weight: 700;
 }
 
@@ -23,15 +24,15 @@ h2 {
   color: #17252a;
 }
 
-input {
+input,
+button {
   display: block;
   margin: 20px 0;
   border: none;
-  padding: 0 50px;
   font-family: 'Inter', sans-serif;
   font-size: 20px;
   font-weight: 500;
   background-color: #17252a;
   color: #feffff;
-  height: 50px;
+  padding: 20px;
 }

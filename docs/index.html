@@ -14,12 +14,14 @@
   <body>
     <div class="container">
       <h1>ISHA <span class="dark">CALCULATOR</span></h1>
-      <script src="scripts/index.js"></script>
-      <h2>Today Maghrib</h2>
-      <input type="time" name="maghrib-time" id="maghrib-time" />
-      <h2>Tomorrow Fajr</h2>
-      <input type="time" name="fajr-time" id="fajr-time" />
-      <input type="submit" value="Calculate" />
+      <form>
+        <label for="maghrib-time">Today Maghrib</label>
+        <input type="time" name="maghrib-time" id="maghrib-time" />
+        <label for="fajr-time">Tomorrow Fajr</label>
+        <input type="time" name="fajr-time" id="fajr-time" />
+        <button id="calculate">Calculate</button>
+      </form>
     </div>
+    <script src="scripts/index.js"></script>
   </body>
 </html>
