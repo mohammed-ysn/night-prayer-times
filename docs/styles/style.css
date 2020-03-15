@@ -1,20 +1,14 @@
 body {
   background-color: #3aafa9;
   font-family: 'Roboto', sans-serif;
-}
-
-h1 {
-  font-size: 50px;
-}
-
-.white {
   color: #feffff;
 }
 
-.black {
-  color: #17252a;
+h1 {
+  font-size: 60px;
+  text-align: center;
 }
 
-#main-heading {
-  text-align: center;
+.dark {
+  color: #17252a;
 }
