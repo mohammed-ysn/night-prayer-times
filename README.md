@@ -1,1 +1,1 @@
-# isha-calculator
+# Isha Calculator
