@@ -5,10 +5,25 @@ const convertToMinutes = prayer => {
 };
 
 const formatTime = time => {
-  const hours = Math.floor(time / 60) - 12;
-  const minutes =
-    (time % 60).toString().length === 1 ? `0${time % 60}` : time % 60;
-  const period = hours >= 12 ? 'AM' : 'PM';
+  let hours;
+  let minutes;
+  let period;
+  if (time >= 1440) {
+    period = 'AM';
+    time -= 720;
+    hours = Math.floor(time / 60);
+    if (hours > 12) {
+      hours -= 12;
+    }
+  } else {
+    period = 'PM';
+    time -= 720;
+    hours = Math.floor(time / 60);
+  }
+  minutes = time % 60;
+  if (minutes.toString().length === 1) {
+    minutes = `0${minutes}`;
+  }
   return `${hours}:${minutes} ${period}`;
 };
 
