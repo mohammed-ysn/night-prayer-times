@@ -15,7 +15,11 @@ const calcTime = (maghrib, fajr) => {
   let difference = calcDifference(maghrib, fajr);
   if (difference[1] >= 60) {
     // Reformat time
+    difference[0] += 1;
+    difference[1] -= 60;
   }
+  const endTime = [maghrib[0] + difference[0], maghrib[1] + difference[1]];
+  return difference;
 };
 
 const createEndTime = (maghrib, fajr) => {
