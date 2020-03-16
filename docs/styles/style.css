@@ -24,8 +24,7 @@ label {
   color: #17252a;
 }
 
-input,
-button {
+input {
   display: block;
   margin: 20px 0;
   border: none;
