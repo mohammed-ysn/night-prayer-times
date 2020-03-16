@@ -5,8 +5,9 @@ const convertToMinutes = prayer => {
 };
 
 const formatTime = time => {
-  let hours = Math.floor(time / 60) - 12;
-  const minutes = time % 60;
+  const hours = Math.floor(time / 60) - 12;
+  const minutes =
+    (time % 60).toString().length === 1 ? `0${time % 60}` : time % 60;
   const period = hours >= 12 ? 'AM' : 'PM';
   return `${hours}:${minutes} ${period}`;
 };
@@ -16,7 +17,6 @@ const calcTime = (maghrib, fajr) => {
   fajr = convertToMinutes(fajr) + 1440;
   const difference = fajr - maghrib;
   const endTime = formatTime(Math.floor(maghrib + difference / 2));
-  alert(endTime);
   return endTime;
 };
 
