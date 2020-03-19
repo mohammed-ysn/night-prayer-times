@@ -10,7 +10,7 @@ body {
 }
 
 h1 {
-  font-size: 2.5em;
+  font-size: 2.4em;
   text-align: center;
   font-weight: 900;
 }
@@ -33,7 +33,7 @@ input {
   margin: 20px 0;
   border: none;
   font-family: 'Inter', sans-serif;
-  font-size: 20px;
+  font-size: 1.1em;
   font-weight: 500;
   background-color: #17252a;
   color: #feffff;
@@ -42,10 +42,4 @@ input {
 
 footer {
   font-weight: 500;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  padding: 0 10px 10px 10px;
 }
