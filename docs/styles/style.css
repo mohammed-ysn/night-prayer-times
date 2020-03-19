@@ -15,11 +15,6 @@ h1 {
   font-weight: 900;
 }
 
-#notice {
-  font-size: 0.7em;
-  font-weight: 500;
-}
-
 a {
   color: #25274d;
 }
@@ -43,4 +38,14 @@ input {
   background-color: #17252a;
   color: #feffff;
   padding: 20px;
+}
+
+footer {
+  font-weight: 500;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 0 10px 10px 10px;
 }
