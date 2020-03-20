@@ -48,7 +48,7 @@ calcBtn.onclick = () => {
   let endTime;
 
   if (document.querySelector('#end-time') === null) {
-    // Does not exit
+    // Does not exist
     endTime = createEndTime(maghrib, fajr);
     document.body.appendChild(endTime);
   } else {
