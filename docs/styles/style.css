@@ -38,6 +38,7 @@ input {
   background-color: #17252a;
   color: #feffff;
   padding: 20px;
+  border-radius: 5px;
 }
 
 footer {
