@@ -11,6 +11,7 @@ Click [here](https://yaseen-m.github.io/isha-calculator/) to go to the website.
 ### Upcoming features
 
 - [ ] Show when the last third of the night starts (for Tahajjud)
+- [ ] Adjust layout when on mobile
 
 ### Note
 
