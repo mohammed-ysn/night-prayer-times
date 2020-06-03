@@ -1,10 +1,10 @@
 const calcBtn = document.querySelector('#calc-btn');
 
-const convertToMinutes = prayer => {
+const convertToMinutes = (prayer) => {
   return Number(prayer.substring(0, 2)) * 60 + Number(prayer.substring(3, 5));
 };
 
-const formatTime = time => {
+const formatTime = (time) => {
   let hours;
   let minutes;
   let period;

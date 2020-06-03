@@ -44,3 +44,9 @@ input {
 footer {
   font-weight: 500;
 }
+
+@media only screen and (max-width: 31em) {
+  body {
+    font-size: 10px;
+  }
+}
