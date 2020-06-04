@@ -9,7 +9,8 @@ body {
   margin: 0 auto;
 }
 
-h1 {
+h1,
+h2 {
   font-size: 2.4em;
   text-align: center;
   font-weight: 900;
@@ -39,6 +40,10 @@ input {
   color: #feffff;
   padding: 20px;
   border-radius: 5px;
+}
+
+h2 {
+  text-align: left;
 }
 
 footer {
