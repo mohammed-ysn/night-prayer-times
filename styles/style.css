@@ -27,7 +27,7 @@ h1 {
 }
 
 a {
-  color: #25274d;
+  color: #22e1ff;
 }
 
 #grid {
@@ -77,6 +77,10 @@ input {
 
 h2 {
   text-align: left;
+}
+
+footer {
+  color: #feffff;
 }
 
 @media only screen and (max-width: 500px) {
