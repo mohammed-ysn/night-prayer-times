@@ -1,10 +1,8 @@
 html {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
-  margin: 0;
-  height: 100%;
   background-image: linear-gradient(
     -225deg,
     #22e1ff 0%,
@@ -14,12 +12,18 @@ body {
   background-repeat: no-repeat;
   font-family: 'Inter', sans-serif;
   color: #25274d;
-  overflow: hidden;
 }
 
 #container {
   width: 80%;
   margin: 0 auto;
+}
+
+h1 {
+  font-size: 3em;
+  margin: 1em 0.5em;
+  text-align: center;
+  /* padding: 20px; */
 }
 
 a {
