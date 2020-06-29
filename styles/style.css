@@ -1,6 +1,5 @@
 html {
   height: 100%;
-  overflow: hidden;
 }
 
 body {
@@ -15,6 +14,7 @@ body {
   background-repeat: no-repeat;
   font-family: 'Inter', sans-serif;
   color: #25274d;
+  overflow: hidden;
 }
 
 #container {
@@ -29,7 +29,7 @@ a {
 #grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(6, 5fr);
+  grid-template-rows: repeat(4, 5fr);
   align-items: center;
   justify-items: center;
   background-color: #feffff;
@@ -59,7 +59,7 @@ input {
   color: #feffff;
 }
 
-.black {
+.blue {
   background-color: #1d8fe1;
 }
 
@@ -70,5 +70,9 @@ h2 {
 @media only screen and (max-width: 500px) {
   body {
     font-size: 10px;
+  }
+
+  #container {
+    width: 90%;
   }
 }

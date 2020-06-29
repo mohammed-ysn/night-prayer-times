@@ -38,7 +38,7 @@ const calcTime = (maghrib, fajr) => {
 const createEndTime = (maghrib, fajr) => {
   const endTime = document.createElement('h2');
   endTime.setAttribute('id', 'end-time');
-  endTime.innerText = `End time: ${calcTime(maghrib, fajr)}`;
+  endTime.innerText = `End of Isha: ${calcTime(maghrib, fajr)}`;
   return endTime;
 };
 
@@ -46,7 +46,6 @@ calcBtn.onclick = () => {
   const maghrib = document.querySelector('#maghrib-time').value;
   const fajr = document.querySelector('#fajr-time').value;
   const section = document.querySelector('#output-time');
-  section.setAttribute('class', 'black');
   let endTime;
   if (document.querySelector('#end-time') === null) {
     // Does not exist
