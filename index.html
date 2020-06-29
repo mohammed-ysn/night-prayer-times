@@ -13,30 +13,35 @@
   </head>
   <body>
     <div id="container">
-      <h1>ISHA <span class="dark">CALCULATOR</span></h1>
-      <section id="input-time-grid">
-        <label for="maghrib-time">Today Maghrib start</label>
-        <label for="fajr-time">Tomorrow Fajr start</label>
-        <input
-          type="time"
-          name="maghrib-time"
-          id="maghrib-time"
-          class="black"
-        />
-        <input type="time" name="fajr-time" id="fajr-time" class="black" />
+      <section id="grid">
+        <h1 id="title">ISHA <span class="dark">CALCULATOR</span></h1>
+        <section id="maghrib">
+          <label for="maghrib-time">Today Maghrib start</label>
+          <input
+            type="time"
+            name="maghrib-time"
+            id="maghrib-time"
+            class="black"
+          />
+        </section>
+        <section id="fajr">
+          <label for="fajr-time">Tomorrow Fajr start</label>
+          <input type="time" name="fajr-time" id="fajr-time" class="black" />
+          <section id="output-time"></section>
+        </section>
+        <input type="button" value="Calculate" id="calc-btn" class="black" />
+
+        <footer>
+          <p>
+            Please report any bugs to
+            <a
+              href="mailto:mailofyaseen@gmail.com?Subject=Re:%20Isha%20Calculator"
+              target="_blank"
+              >Yaseen</a
+            >.
+          </p>
+        </footer>
       </section>
-      <input type="button" value="Calculate" id="calc-btn" class="black" />
-      <section id="output-time"></section>
-      <footer>
-        <p>
-          Please report any bugs to
-          <a
-            href="mailto:mailofyaseen@gmail.com?Subject=Re:%20Isha%20Calculator"
-            target="_blank"
-            >Yaseen</a
-          >.
-        </p>
-      </footer>
     </div>
     <script src="scripts/app.js"></script>
   </body>

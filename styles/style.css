@@ -11,8 +11,6 @@ body {
 
 h1,
 h2 {
-  font-size: 2.4em;
-  text-align: center;
   font-weight: 900;
 }
 
@@ -21,7 +19,6 @@ a {
 }
 
 label {
-  font-size: 1.5em;
   font-weight: 700;
 }
 
@@ -29,39 +26,47 @@ label {
   color: #17252a;
 }
 
-#input-time-grid {
+#grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(6, 5fr);
   align-items: center;
   justify-items: center;
 }
 
+#title {
+  grid-column-end: span 2;
+}
+
+#calc-btn {
+  grid-column-end: span 2;
+}
+
+#output-time {
+  grid-column-end: span 2;
+}
+
 input {
   display: block;
-  margin: 1em 0;
   border: none;
   font-family: 'Inter', sans-serif;
-  font-size: 1.1em;
   font-weight: 500;
   color: #feffff;
 }
 
 .black {
   background-color: #17252a;
-  border-radius: 0.8em;
-  padding: 1em;
 }
 
 h2 {
   text-align: left;
-  margin: 0;
 }
 
 footer {
   font-weight: 500;
 }
 
-@media only screen and (max-width: 31em) {
+@media only screen and (max-width: 500px) {
   body {
     font-size: 10px;
   }
