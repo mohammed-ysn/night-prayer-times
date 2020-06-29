@@ -29,21 +29,32 @@ label {
   color: #17252a;
 }
 
+#input-time-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  justify-items: center;
+}
+
 input {
   display: block;
-  margin: 20px 0;
+  margin: 1em 0;
   border: none;
   font-family: 'Inter', sans-serif;
   font-size: 1.1em;
   font-weight: 500;
-  background-color: #17252a;
   color: #feffff;
-  padding: 20px;
-  border-radius: 5px;
+}
+
+.black {
+  background-color: #17252a;
+  border-radius: 0.8em;
+  padding: 1em;
 }
 
 h2 {
   text-align: left;
+  margin: 0;
 }
 
 footer {

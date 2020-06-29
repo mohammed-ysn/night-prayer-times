@@ -45,7 +45,8 @@ const createEndTime = (maghrib, fajr) => {
 calcBtn.onclick = () => {
   const maghrib = document.querySelector('#maghrib-time').value;
   const fajr = document.querySelector('#fajr-time').value;
-  const section = document.querySelector('#time-container');
+  const section = document.querySelector('#output-time');
+  section.setAttribute('class', 'black');
   let endTime;
   if (document.querySelector('#end-time') === null) {
     // Does not exist

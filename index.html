@@ -14,15 +14,22 @@
   <body>
     <div id="container">
       <h1>ISHA <span class="dark">CALCULATOR</span></h1>
-      <label for="maghrib-time">Today Maghrib start</label>
-      <input type="time" name="maghrib-time" id="maghrib-time" />
-      <label for="fajr-time">Tomorrow Fajr start</label>
-      <input type="time" name="fajr-time" id="fajr-time" />
-      <input type="button" value="Calculate" id="calc-btn" />
-      <section id="time-container"></section>
+      <section id="input-time-grid">
+        <label for="maghrib-time">Today Maghrib start</label>
+        <label for="fajr-time">Tomorrow Fajr start</label>
+        <input
+          type="time"
+          name="maghrib-time"
+          id="maghrib-time"
+          class="black"
+        />
+        <input type="time" name="fajr-time" id="fajr-time" class="black" />
+      </section>
+      <input type="button" value="Calculate" id="calc-btn" class="black" />
+      <section id="output-time"></section>
       <footer>
         <p>
-          This website is a work in progress. Please report any bugs to
+          Please report any bugs to
           <a
             href="mailto:mailofyaseen@gmail.com?Subject=Re:%20Isha%20Calculator"
             target="_blank"
