@@ -1,57 +1,101 @@
+html {
+  min-height: 100%;
+}
+
 body {
-  background-color: #3aafa9;
+  background-image: linear-gradient(
+    -225deg,
+    #22e1ff 0%,
+    #1d8fe1 48%,
+    #625eb1 100%
+  );
   font-family: 'Inter', sans-serif;
-  color: #feffff;
-}
-
-#container {
-  width: 80%;
-  margin: 0 auto;
-}
-
-h1,
-h2 {
-  font-size: 2.4em;
-  text-align: center;
-  font-weight: 900;
-}
-
-a {
+  font-size: 16px;
   color: #25274d;
 }
 
-label {
-  font-size: 1.5em;
-  font-weight: 700;
+#main-container {
+  width: 80%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+a {
+  color: #22e1ff;
 }
 
-.dark {
-  color: #17252a;
+#grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 8em 12em 8em;
+  align-items: center;
+  justify-items: center;
+  background-color: #feffff;
+  border-radius: 1.5em;
+  box-shadow: 0 5px 10px rgba(154, 160, 185, 0.025),
+    0 15px 40px rgba(166, 173, 201, 0.2);
+  margin: 2em auto;
+}
+
+#title {
+  font-size: 3em;
+  text-align: center;
+  grid-column-end: span 2;
+  margin: 0.2em 0 0 0;
+}
+
+#calc-btn {
+  grid-column-end: span 2;
+  padding: 1.4em;
+  font-size: 1.2em;
+  margin-bottom: 1em;
+}
+
+h3 {
+  margin: 0 0 1em 0;
+  font-size: 1.3em;
+  font-weight: normal;
 }
 
 input {
   display: block;
-  margin: 20px 0;
   border: none;
   font-family: 'Inter', sans-serif;
-  font-size: 1.1em;
-  font-weight: 500;
-  background-color: #17252a;
   color: #feffff;
-  padding: 20px;
-  border-radius: 5px;
+  padding: 1.4em;
+  font-size: 1em;
+  border-radius: 1em;
+  margin: 0;
+}
+
+.blue {
+  background-color: #1d8fe1;
 }
 
 h2 {
   text-align: left;
 }
 
-footer {
-  font-weight: 500;
+#swal2-title {
+  color: #25274d;
+  font-size: 2.4em;
 }
 
-@media only screen and (max-width: 31em) {
+footer {
+  color: #feffff;
+}
+
+@media only screen and (max-width: 725px) {
   body {
-    font-size: 10px;
+    font-size: 14px;
+  }
+
+  /* #main-container {
+    width: 90%;
+  } */
+}
+
+@media only screen and (max-width: 500px) {
+  body {
+    font-size: 11px;
   }
 }
