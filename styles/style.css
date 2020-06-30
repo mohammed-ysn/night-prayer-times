@@ -62,15 +62,12 @@ input {
   border: none;
   font-family: 'Inter', sans-serif;
   color: #feffff;
-  padding: 1.4em;
+  padding: 0.3em 1.4em;
   font-size: 1em;
   border-radius: 1em;
   margin: 0;
   min-width: 9em;
-  min-height: 2em;
-}
-
-.blue {
+  min-height: 3em;
   background-image: radial-gradient(
     circle 248px at center,
     #16d9e3 0%,
