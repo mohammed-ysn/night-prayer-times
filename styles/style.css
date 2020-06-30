@@ -27,7 +27,7 @@ a {
 #grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 8em 12em 8em;
+  grid-template-rows: 8em 11em 8em;
   align-items: center;
   justify-items: center;
   background-color: #feffff;
@@ -48,7 +48,6 @@ a {
   grid-column-end: span 2;
   padding: 1.4em;
   font-size: 1.2em;
-  margin-bottom: 1em;
 }
 
 h3 {
@@ -80,9 +79,8 @@ input {
   text-align: center;
 }
 
-#swal2-title {
-  color: #25274d;
-  font-size: 2em;
+.output-time {
+  margin: 2em 3em 3em 3em;
 }
 
 footer {

@@ -14,7 +14,6 @@ Click [here](https://mohammed-ysn.github.io/isha-calculator/) to go to the websi
 ## Credits
 
 - Prayer mat icon made by [Freepik](https://www.flaticon.com/authors/freepik) from [Flaticon](https://www.flaticon.com/)
-- Popup made by [SweetAlert2](https://sweetalert2.github.io/)
 
 #### Note
 

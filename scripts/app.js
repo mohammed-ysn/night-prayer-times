@@ -45,13 +45,17 @@ const createEndTime = (maghrib, fajr) => {
 calcBtn.onclick = () => {
   const maghrib = document.querySelector('#maghrib-time').value;
   const fajr = document.querySelector('#fajr-time').value;
+  const grid = document.querySelector('#grid');
+  const ishaEndContainer = document.querySelector('#end-of-isha');
+  const lastThirdContainer = document.querySelector('#last-third');
   endTime = calcTime(maghrib, fajr);
-  Swal.fire({
-    titleText: `End of Isha: ${endTime}`,
-    timer: 4000,
-    showConfirmButton: false,
-    timerProgressBar: true,
-    allowOutsideClick: false,
-    background: '#feffff',
-  });
+  if (!ishaEndContainer.hasChildNodes()) {
+    grid.setAttribute('style', 'grid-template-rows: 8em 11em 8em 8em;');
+    const ishaEndHeading = document.createElement('h2');
+    ishaEndHeading.innerText = `End of Isha: ${endTime}`;
+    ishaEndContainer.appendChild(ishaEndHeading);
+    const lastThirdHeading = document.createElement('h2');
+    lastThirdHeading.innerText = 'Last third of the night: coming soon...';
+    lastThirdContainer.appendChild(lastThirdHeading);
+  }
 };
