@@ -52,6 +52,7 @@ calcBtn.onclick = () => {
     showConfirmButton: false,
     timerProgressBar: true,
     allowOutsideClick: false,
+    stopKeydownPropagation: false,
     background: '#feffff',
   });
 };
