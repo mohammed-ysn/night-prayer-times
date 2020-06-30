@@ -49,7 +49,10 @@ calcBtn.onclick = () => {
   const ishaEndContainer = document.querySelector('#end-of-isha');
   const lastThirdContainer = document.querySelector('#last-third');
   endTime = calcTime(maghrib, fajr);
-  if (!ishaEndContainer.hasChildNodes()) {
+  if (ishaEndContainer.hasChildNodes()) {
+    const ishaEndHeading = document.querySelector('#end-of-isha h2');
+    ishaEndHeading.innerText = `End of Isha: ${endTime}`;
+  } else {
     grid.setAttribute('style', 'grid-template-rows: 8em 11em 8em 8em;');
     const ishaEndHeading = document.createElement('h2');
     ishaEndHeading.innerText = `End of Isha: ${endTime}`;
