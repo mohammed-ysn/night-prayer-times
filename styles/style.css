@@ -79,6 +79,10 @@ input {
   );
 }
 
+.prayer {
+  text-align: center;
+}
+
 #swal2-title {
   color: #25274d;
   font-size: 2em;
