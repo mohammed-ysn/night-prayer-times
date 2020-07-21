@@ -97,10 +97,6 @@ footer {
   body {
     font-size: 12px;
   }
-
-  .prayer {
-    grid-column-end: span 2;
-  }
 }
 
 @media only screen and (max-width: 420px) {
