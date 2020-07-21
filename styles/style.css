@@ -27,7 +27,7 @@ a {
 #grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 8em 2em 8em 2em 8em 8em;
+  grid-template-rows: 8em 2em 7em 2em 7em 7em;
   align-items: center;
   justify-items: center;
   background-color: #feffff;
@@ -76,7 +76,7 @@ input {
 }
 
 .output-time {
-  margin: 2em 3em 3em 3em;
+  margin: 2em;
 }
 
 footer {
