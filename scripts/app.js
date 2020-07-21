@@ -35,27 +35,18 @@ const calcTime = (maghrib, fajr) => {
   return endTime;
 };
 
-const createEndTime = (maghrib, fajr) => {
-  const endTime = document.createElement('h2');
-  endTime.setAttribute('id', 'end-time');
-  endTime.innerText = `End of Isha: ${calcTime(maghrib, fajr)}`;
-  return endTime;
-};
-
 calcBtn.onclick = () => {
   const maghrib = document.querySelector('#maghrib-time').value;
   const fajr = document.querySelector('#fajr-time').value;
-  const grid = document.querySelector('#grid');
   const ishaEndContainer = document.querySelector('#end-of-isha');
   const lastThirdContainer = document.querySelector('#last-third');
   endTime = calcTime(maghrib, fajr);
   if (ishaEndContainer.hasChildNodes()) {
     const ishaEndHeading = document.querySelector('#end-of-isha h2');
-    ishaEndHeading.innerText = `End of Isha: ${endTime}`;
+    ishaEndHeading.innerText = `Isha ends at: ${endTime}`;
   } else {
-    grid.setAttribute('style', 'grid-template-rows: 8em 11em 8em 8em;');
     const ishaEndHeading = document.createElement('h2');
-    ishaEndHeading.innerText = `End of Isha: ${endTime}`;
+    ishaEndHeading.innerText = `Isha ends at: ${endTime}`;
     ishaEndContainer.appendChild(ishaEndHeading);
     const lastThirdHeading = document.createElement('h2');
     lastThirdHeading.innerText = 'Last third of the night: coming soon...';
