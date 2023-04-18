@@ -19,6 +19,10 @@ form {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   max-width: 600px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 label {
