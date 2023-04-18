@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Night Prayer Times</title>
     <link rel="icon" href="images/favicon.ico" />
     <link rel="stylesheet" href="styles/styles.css" />
@@ -14,13 +17,28 @@
         type="time"
         id="maghribTimeInput"
         name="maghribTimeInput"
+        oninput="checkFields()"
       /><br /><br />
       <label for="fajrTimeInput">Fajr Time:</label>
-      <input type="time" id="fajrTimeInput" name="fajrTimeInput" /><br /><br />
-      <button type="button" onclick="calculateTimes()">Calculate</button>
+      <input
+        type="time"
+        id="fajrTimeInput"
+        name="fajrTimeInput"
+        oninput="checkFields()"
+      /><br /><br />
+      <button
+        type="button"
+        onclick="calculateTimes()"
+        disabled
+        id="calculateButton"
+      >
+        Calculate
+      </button>
     </form>
-    <p>End of Isha: <span id="midpointTimeDisplay"></span></p>
-    <p>Last third: <span id="lastThirdTimeDisplay"></span></p>
+    <div class="output-container">
+      <p>End of Isha: <span id="midpointTimeDisplay"></span></p>
+      <p>Last third: <span id="lastThirdTimeDisplay"></span></p>
+    </div>
     <script src="scripts/index.js"></script>
   </body>
 </html>

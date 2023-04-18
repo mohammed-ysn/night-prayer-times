@@ -1,9 +1,12 @@
-function calculateTimes() {
-  const maghribTimeInput = document.getElementById("maghribTimeInput").value;
-  const fajrTimeInput = document.getElementById("fajrTimeInput").value;
+const maghribTimeInput = document.getElementById("maghribTimeInput");
+const fajrTimeInput = document.getElementById("fajrTimeInput");
+const calculateButton = document.getElementById("calculateButton");
+const midpointTimeDisplay = document.getElementById("midpointTimeDisplay");
+const lastThirdTimeDisplay = document.getElementById("lastThirdTimeDisplay");
 
-  const maghribDate = new Date(`2000-01-01T${maghribTimeInput}:00`);
-  let fajrDate = new Date(`2000-01-01T${fajrTimeInput}:00`);
+function calculateTimes() {
+  const maghribDate = new Date(`2000-01-01T${maghribTimeInput.value}:00`);
+  const fajrDate = new Date(`2000-01-01T${fajrTimeInput.value}:00`);
 
   if (fajrDate < maghribDate) {
     fajrDate.setDate(fajrDate.getDate() + 1);
@@ -12,11 +15,8 @@ function calculateTimes() {
   const midpointTime = getTimeBetweenDates(maghribDate, fajrDate, 1 / 2);
   const lastThirdTime = getTimeBetweenDates(maghribDate, fajrDate, 2 / 3);
 
-  // set the innerHTML of the paragraph elements to display the calculated times
-  document.getElementById("midpointTimeDisplay").innerHTML =
-    getTimeWithAMPM(midpointTime);
-  document.getElementById("lastThirdTimeDisplay").innerHTML =
-    getTimeWithAMPM(lastThirdTime);
+  midpointTimeDisplay.textContent = getTimeWithAMPM(midpointTime);
+  lastThirdTimeDisplay.textContent = getTimeWithAMPM(lastThirdTime);
 }
 
 function getTimeBetweenDates(date1, date2, fraction) {
@@ -32,7 +32,6 @@ function getTimeWithAMPM(date) {
 
   const ampm = hours >= 12 ? "PM" : "AM";
 
-  // convert hours from military time to standard time
   const standardHours = hours % 12 || 12;
 
   const timeString = `${standardHours}:${minutes
@@ -40,4 +39,12 @@ function getTimeWithAMPM(date) {
     .padStart(2, "0")} ${ampm}`;
 
   return timeString;
+}
+
+function checkFields() {
+  if (maghribTimeInput.value && fajrTimeInput.value) {
+    calculateButton.disabled = false;
+  } else {
+    calculateButton.disabled = true;
+  }
 }
