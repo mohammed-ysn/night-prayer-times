@@ -1,49 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Night prayer times</title>
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="styles/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css?family=Inter:500,700,900&display=swap"
-      rel="stylesheet"
-    />
+    <title>Night Prayer Times</title>
+    <link rel="icon" href="images/favicon.ico" />
+    <link rel="stylesheet" href="styles/styles.css" />
   </head>
+
   <body>
-    <div id="main-container">
-      <section id="grid">
-        <h1 id="title">Night prayer times</h1>
-        <h3>Today Maghrib start</h3>
-        <input type="time" name="maghrib-time" id="maghrib-time" />
-        <h3>Tomorrow Fajr start</h3>
-        <input type="time" name="fajr-time" id="fajr-time" />
-        <input type="button" value="Calculate" id="calc-btn" />
-        <section id="end-of-isha" class="output-time"></section>
-        <section id="last-third" class="output-time"></section>
-      </section>
-      <footer>
-        <h3>Note</h3>
-        <p>
-          It is assumed that Maghrib starts before 12 a.m. and that Fajr starts
-          at 12 a.m. or after.
-        </p>
-        <p>
-          The end of Isha is taken as midnight (the midpoint between the start
-          of Maghrib today and the start of Fajr tomorrow).
-        </p>
-        <p>
-          Please report any bugs to
-          <a
-            href="mailto:mohammedysn15@gmail.com?Subject=Night%20prayer%20times"
-            target="_blank"
-            >Mohammed Yaseen</a
-          >.
-        </p>
-      </footer>
-    </div>
-    <script src="scripts/app.js"></script>
+    <h1>Night Prayer Times</h1>
+    <form>
+      <label for="maghribTimeInput">Maghrib Time:</label>
+      <input
+        type="time"
+        id="maghribTimeInput"
+        name="maghribTimeInput"
+        value="20:00"
+      /><br /><br />
+      <label for="fajrTimeInput">Fajr Time:</label>
+      <input
+        type="time"
+        id="fajrTimeInput"
+        name="fajrTimeInput"
+        value="04:00"
+      /><br /><br />
+      <button type="button" onclick="calculateTimes()">Calculate</button>
+    </form>
+    <p>End of Isha: <span id="midpointTimeDisplay"></span></p>
+    <p>Last third: <span id="lastThirdTimeDisplay"></span></p>
+    <script src="scripts/index.js"></script>
   </body>
 </html>
