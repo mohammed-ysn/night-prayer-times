@@ -48,3 +48,11 @@ function checkFields() {
     calculateButton.disabled = true;
   }
 }
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    if (!calculateButton.disabled) {
+      calculateButton.click();
+    }
+  }
+});
