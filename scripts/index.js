@@ -4,6 +4,18 @@ const calculateButton = document.getElementById("calculateButton");
 const midpointTimeDisplay = document.getElementById("midpointTimeDisplay");
 const lastThirdTimeDisplay = document.getElementById("lastThirdTimeDisplay");
 
+maghribTimeInput.addEventListener("input", checkFields);
+fajrTimeInput.addEventListener("input", checkFields);
+calculateButton.addEventListener("click", calculateTimes);
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    if (!calculateButton.disabled) {
+      calculateButton.click();
+    }
+  }
+});
+
 function calculateTimes() {
   const maghribDate = new Date(`2000-01-01T${maghribTimeInput.value}:00`);
   const fajrDate = new Date(`2000-01-01T${fajrTimeInput.value}:00`);
@@ -19,6 +31,13 @@ function calculateTimes() {
   lastThirdTimeDisplay.textContent = getTimeWithAMPM(lastThirdTime);
 }
 
+function checkFields() {
+  if (maghribTimeInput.value && fajrTimeInput.value) {
+    calculateButton.disabled = false;
+  } else {
+    calculateButton.disabled = true;
+  }
+}
 function getTimeBetweenDates(date1, date2, fraction) {
   const timeDiff = Math.abs(date1 - date2);
   const fractionOfTimeDiff = timeDiff * fraction;
@@ -40,19 +59,3 @@ function getTimeWithAMPM(date) {
 
   return timeString;
 }
-
-function checkFields() {
-  if (maghribTimeInput.value && fajrTimeInput.value) {
-    calculateButton.disabled = false;
-  } else {
-    calculateButton.disabled = true;
-  }
-}
-
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Enter") {
-    if (!calculateButton.disabled) {
-      calculateButton.click();
-    }
-  }
-});

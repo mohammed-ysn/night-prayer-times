@@ -25,32 +25,15 @@
         </p>
         <form>
           <label for="maghribTimeInput">Enter Maghrib time:</label>
-          <input
-            type="time"
-            id="maghribTimeInput"
-            name="maghribTimeInput"
-            oninput="checkFields()"
-          />
+          <input type="time" id="maghribTimeInput" name="maghribTimeInput" />
           <label for="fajrTimeInput">Enter Fajr time:</label>
-          <input
-            type="time"
-            id="fajrTimeInput"
-            name="fajrTimeInput"
-            oninput="checkFields()"
-          />
-          <button
-            type="button"
-            onclick="calculateTimes()"
-            disabled
-            id="calculateButton"
-          >
-            Calculate
-          </button>
+          <input type="time" id="fajrTimeInput" name="fajrTimeInput" />
+          <button type="button" id="calculateButton" disabled>Calculate</button>
         </form>
         <p>End of Isha: <span id="midpointTimeDisplay"></span></p>
         <p>Last third: <span id="lastThirdTimeDisplay"></span></p>
-        <script src="scripts/index.js"></script>
       </div>
     </div>
+    <script src="scripts/index.js"></script>
   </body>
 </html>
