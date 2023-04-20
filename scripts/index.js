@@ -4,8 +4,10 @@ const calculateButton = document.getElementById("calculateButton");
 const midpointTimeDisplay = document.getElementById("midpointTimeDisplay");
 const lastThirdTimeDisplay = document.getElementById("lastThirdTimeDisplay");
 
-maghribTimeInput.addEventListener("input", checkFields);
-fajrTimeInput.addEventListener("input", checkFields);
+maghribTimeInput.addEventListener("input", checkAllFieldsComplete);
+maghribTimeInput.addEventListener("change", checkReasonableMaghribTime);
+fajrTimeInput.addEventListener("input", checkAllFieldsComplete);
+fajrTimeInput.addEventListener("change", checkReasonableFajrTime);
 calculateButton.addEventListener("click", calculateTimes);
 
 document.addEventListener("keydown", function (event) {
@@ -31,13 +33,68 @@ function calculateTimes() {
   lastThirdTimeDisplay.textContent = getTimeWithAMPM(lastThirdTime);
 }
 
-function checkFields() {
+function checkAllFieldsComplete() {
   if (maghribTimeInput.value && fajrTimeInput.value) {
     calculateButton.disabled = false;
   } else {
     calculateButton.disabled = true;
   }
 }
+
+function checkReasonableMaghribTime() {
+  const enteredTime = maghribTimeInput.value;
+  const time = new Date(`2000-01-01T${enteredTime}`);
+  console.log(time);
+  const hours = time.getHours();
+
+  // reasonable defined as 1pm <= time <= 11 pm
+  // ignoring minutes
+  if (hours < 13 || hours > 23) {
+    maghribTimeInput.style.borderColor = "red";
+    createWarningMessage(
+      "maghribWarning",
+      "🚨 Please check that the time for Maghrib is correct"
+    );
+  } else {
+    maghribTimeInput.style.borderColor = "";
+    const warningMsg = document.querySelector("#maghribWarning");
+    if (warningMsg) warningMsg.remove();
+  }
+}
+
+function checkReasonableFajrTime() {
+  const enteredTime = fajrTimeInput.value;
+  const time = new Date(`2000-01-01T${enteredTime}`);
+  const hours = time.getHours();
+
+  // reasonable defined as 12 am <= time <= 7 am
+  // ignoring minutes
+  if (hours > 8) {
+    maghribTimeInput.style.borderColor = "red";
+    createWarningMessage(
+      "fajrWarning",
+      "🚨 Please check that the time for Fajr is correct"
+    );
+  } else {
+    maghribTimeInput.style.borderColor = "";
+    const warningMsg = document.querySelector("#fajrWarning");
+    if (warningMsg) warningMsg.remove();
+  }
+}
+
+function createWarningMessage(id, message) {
+  let warningMsg = document.querySelector(`#${id}`);
+  if (warningMsg) {
+    warningMsg.textContent = message;
+  } else {
+    warningMsg = document.createElement("p");
+    warningMsg.id = id;
+    warningMsg.textContent = message;
+    warningMsg.style.color = "orange";
+    calculateButton.insertAdjacentElement("beforebegin", warningMsg);
+  }
+}
+
 function getTimeBetweenDates(date1, date2, fraction) {
   const timeDiff = Math.abs(date1 - date2);
   const fractionOfTimeDiff = timeDiff * fraction;
