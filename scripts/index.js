@@ -17,8 +17,8 @@ document.addEventListener("keydown", function (event) {
 });
 
 function calculateTimes() {
-  const maghribDate = new Date(`2000-01-01T${maghribTimeInput.value}:00`);
-  const fajrDate = new Date(`2000-01-01T${fajrTimeInput.value}:00`);
+  const maghribDate = new Date(`2000-01-01T${maghribTimeInput.value}`);
+  const fajrDate = new Date(`2000-01-01T${fajrTimeInput.value}`);
 
   if (fajrDate < maghribDate) {
     fajrDate.setDate(fajrDate.getDate() + 1);
