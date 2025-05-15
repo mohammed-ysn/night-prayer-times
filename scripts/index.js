@@ -1,118 +1,88 @@
-const maghribTimeInput = document.getElementById("maghribTimeInput");
-const fajrTimeInput = document.getElementById("fajrTimeInput");
+// Element selectors
+const maghribInput = document.getElementById("maghribTimeInput");
+const fajrInput = document.getElementById("fajrTimeInput");
 const calculateButton = document.getElementById("calculateButton");
-const midpointTimeDisplay = document.getElementById("midpointTimeDisplay");
-const lastThirdTimeDisplay = document.getElementById("lastThirdTimeDisplay");
+const midpointDisplay = document.getElementById("midpointTimeDisplay");
+const lastThirdDisplay = document.getElementById("lastThirdTimeDisplay");
 
-maghribTimeInput.addEventListener("input", checkAllFieldsComplete);
-maghribTimeInput.addEventListener("change", checkReasonableMaghribTime);
-fajrTimeInput.addEventListener("input", checkAllFieldsComplete);
-fajrTimeInput.addEventListener("change", checkReasonableFajrTime);
-calculateButton.addEventListener("click", calculateTimes);
+// Constants
+const DATE_BASE = "2000-01-01T";
+const MAGHRIB_HOURS_RANGE = { min: 13, max: 23 };
+const FAJR_MAX_HOUR = 8;
 
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Enter") {
-    if (!calculateButton.disabled) {
-      calculateButton.click();
-    }
+// Event listeners
+maghribInput.addEventListener("input", updateCalculateButtonState);
+fajrInput.addEventListener("input", updateCalculateButtonState);
+maghribInput.addEventListener("change", () =>
+  validateTimeRange(maghribInput, MAGHRIB_HOURS_RANGE, "maghribWarning", "🚨 Please check that the time for Maghrib is correct")
+);
+fajrInput.addEventListener("change", () =>
+  validateTimeRange(fajrInput, { min: 0, max: FAJR_MAX_HOUR }, "fajrWarning", "🚨 Please check that the time for Fajr is correct")
+);
+calculateButton.addEventListener("click", calculatePrayerTimes);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !calculateButton.disabled) {
+    calculateButton.click();
   }
 });
 
-function calculateTimes() {
-  const maghribDate = new Date(`2000-01-01T${maghribTimeInput.value}`);
-  const fajrDate = new Date(`2000-01-01T${fajrTimeInput.value}`);
+// Functions
+function updateCalculateButtonState() {
+  calculateButton.disabled = !(maghribInput.value && fajrInput.value);
+}
 
-  if (fajrDate < maghribDate) {
-    fajrDate.setDate(fajrDate.getDate() + 1);
+function calculatePrayerTimes() {
+  const maghribTime = parseTimeInput(maghribInput.value);
+  const fajrTime = parseTimeInput(fajrInput.value, true);
+
+  const midpoint = getFractionalTimeBetween(maghribTime, fajrTime, 0.5);
+  const lastThird = getFractionalTimeBetween(maghribTime, fajrTime, 2 / 3);
+
+  midpointDisplay.textContent = formatTime(midpoint);
+  lastThirdDisplay.textContent = formatTime(lastThird);
+}
+
+function parseTimeInput(timeStr, allowNextDay = false) {
+  const time = new Date(`${DATE_BASE}${timeStr}`);
+  if (allowNextDay && time < new Date(`${DATE_BASE}${maghribInput.value}`)) {
+    time.setDate(time.getDate() + 1);
   }
-
-  const midpointTime = getTimeBetweenDates(maghribDate, fajrDate, 1 / 2);
-  const lastThirdTime = getTimeBetweenDates(maghribDate, fajrDate, 2 / 3);
-
-  midpointTimeDisplay.textContent = getTimeWithAMPM(midpointTime);
-  lastThirdTimeDisplay.textContent = getTimeWithAMPM(lastThirdTime);
+  return time;
 }
 
-function checkAllFieldsComplete() {
-  if (maghribTimeInput.value && fajrTimeInput.value) {
-    calculateButton.disabled = false;
-  } else {
-    calculateButton.disabled = true;
-  }
+function getFractionalTimeBetween(start, end, fraction) {
+  const diff = end - start;
+  return new Date(start.getTime() + diff * fraction);
 }
 
-function checkReasonableMaghribTime() {
-  const enteredTime = maghribTimeInput.value;
-  const time = new Date(`2000-01-01T${enteredTime}`);
-  console.log(time);
-  const hours = time.getHours();
-
-  // reasonable defined as 1pm <= time <= 11 pm
-  // ignoring minutes
-  if (hours < 13 || hours > 23) {
-    maghribTimeInput.style.borderColor = "red";
-    createWarningMessage(
-      "maghribWarning",
-      "🚨 Please check that the time for Maghrib is correct"
-    );
-  } else {
-    maghribTimeInput.style.borderColor = "";
-    const warningMsg = document.querySelector("#maghribWarning");
-    if (warningMsg) warningMsg.remove();
-  }
-}
-
-function checkReasonableFajrTime() {
-  const enteredTime = fajrTimeInput.value;
-  const time = new Date(`2000-01-01T${enteredTime}`);
-  const hours = time.getHours();
-
-  // reasonable defined as 12 am <= time <= 7 am
-  // ignoring minutes
-  if (hours > 8) {
-    maghribTimeInput.style.borderColor = "red";
-    createWarningMessage(
-      "fajrWarning",
-      "🚨 Please check that the time for Fajr is correct"
-    );
-  } else {
-    maghribTimeInput.style.borderColor = "";
-    const warningMsg = document.querySelector("#fajrWarning");
-    if (warningMsg) warningMsg.remove();
-  }
-}
-
-function createWarningMessage(id, message) {
-  let warningMsg = document.querySelector(`#${id}`);
-  if (warningMsg) {
-    warningMsg.textContent = message;
-  } else {
-    warningMsg = document.createElement("p");
-    warningMsg.id = id;
-    warningMsg.textContent = message;
-    warningMsg.style.color = "orange";
-    calculateButton.insertAdjacentElement("beforebegin", warningMsg);
-  }
-}
-
-function getTimeBetweenDates(date1, date2, fraction) {
-  const timeDiff = Math.abs(date1 - date2);
-  const fractionOfTimeDiff = timeDiff * fraction;
-  const calculatedTime = new Date(date1.getTime() + fractionOfTimeDiff);
-  return calculatedTime;
-}
-
-function getTimeWithAMPM(date) {
+function formatTime(date) {
   const hours = date.getHours();
-  const minutes = date.getMinutes();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const period = hours >= 12 ? "PM" : "AM";
+  const displayHour = hours % 12 || 12;
+  return `${displayHour}:${minutes} ${period}`;
+}
 
-  const ampm = hours >= 12 ? "PM" : "AM";
+function validateTimeRange(input, { min, max }, warningId, warningMsg) {
+  const hours = new Date(`${DATE_BASE}${input.value}`).getHours();
+  const isValid = hours >= min && hours <= max;
 
-  const standardHours = hours % 12 || 12;
+  input.style.borderColor = isValid ? "" : "red";
+  toggleWarningMessage(!isValid, warningId, warningMsg);
+}
 
-  const timeString = `${standardHours}:${minutes
-    .toString()
-    .padStart(2, "0")} ${ampm}`;
+function toggleWarningMessage(show, id, message) {
+  let warning = document.getElementById(id);
 
-  return timeString;
+  if (show) {
+    if (!warning) {
+      warning = document.createElement("p");
+      warning.id = id;
+      warning.style.color = "orange";
+      calculateButton.insertAdjacentElement("beforebegin", warning);
+    }
+    warning.textContent = message;
+  } else if (warning) {
+    warning.remove();
+  }
 }
