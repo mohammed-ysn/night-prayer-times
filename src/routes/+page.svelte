@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { calculateTimes } from '$lib/time';
+	import TimeInput from '$lib/components/TimeInput.svelte';
+	import Result from '$lib/components/Result.svelte';
 
 	let maghrib = '';
 	let fajr = '';
@@ -31,65 +34,9 @@
 	$: fajrWarning =
 		fajrHour !== null && (fajrHour < FAJR_RANGE.min || fajrHour > FAJR_RANGE.max);
 
-	// Reactive calculations - auto-update when inputs change
+	// Reactive calculations
 	$: canCalculate = maghrib && fajr;
-
 	$: results = canCalculate ? calculateTimes(maghrib, fajr) : null;
-
-	function calculateTimes(maghribStr: string, fajrStr: string) {
-		// Use today's date for real-time comparison
-		const today = new Date();
-		const [maghribH, maghribM] = maghribStr.split(':').map(Number);
-		const [fajrH, fajrM] = fajrStr.split(':').map(Number);
-
-		const maghribTime = new Date(today);
-		maghribTime.setHours(maghribH, maghribM, 0, 0);
-
-		const fajrTime = new Date(today);
-		fajrTime.setHours(fajrH, fajrM, 0, 0);
-
-		// Fajr is next day if it's before Maghrib
-		if (fajrTime <= maghribTime) {
-			fajrTime.setDate(fajrTime.getDate() + 1);
-		}
-
-		const diff = fajrTime.getTime() - maghribTime.getTime();
-
-		const endOfIsha = new Date(maghribTime.getTime() + diff * 0.5);
-		const lastThird = new Date(maghribTime.getTime() + diff * (2 / 3));
-
-		return {
-			endOfIsha,
-			lastThird,
-			endOfIshaFormatted: formatTime(endOfIsha),
-			lastThirdFormatted: formatTime(lastThird)
-		};
-	}
-
-	function getRelativeTime(target: Date, current: Date): string {
-		const diffMs = target.getTime() - current.getTime();
-		const absDiffMs = Math.abs(diffMs);
-
-		const hours = Math.floor(absDiffMs / (1000 * 60 * 60));
-		const minutes = Math.floor((absDiffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-		let timeStr = '';
-		if (hours > 0) {
-			timeStr = `${hours}h ${minutes}m`;
-		} else {
-			timeStr = `${minutes}m`;
-		}
-
-		return diffMs > 0 ? `in ${timeStr}` : `${timeStr} ago`;
-	}
-
-	function formatTime(date: Date): string {
-		const hours = date.getHours();
-		const minutes = date.getMinutes().toString().padStart(2, '0');
-		const period = hours >= 12 ? 'PM' : 'AM';
-		const displayHour = hours % 12 || 12;
-		return `${displayHour}:${minutes} ${period}`;
-	}
 </script>
 
 <svelte:head>
@@ -103,41 +50,25 @@
 		<p class="description">Enter Maghrib and the following morning's Fajr</p>
 
 		<div class="inputs">
-			<label>
-				Maghrib
-				<input type="time" bind:value={maghrib} class:warning={maghribWarning} />
-			</label>
+			<TimeInput
+				label="Maghrib"
+				bind:value={maghrib}
+				warning={maghribWarning}
+				warningText="That doesn't look like a typical Maghrib time — it's usually in the evening"
+			/>
 
-			<label>
-				Fajr
-				<input type="time" bind:value={fajr} class:warning={fajrWarning} />
-			</label>
+			<TimeInput
+				label="Fajr"
+				bind:value={fajr}
+				warning={fajrWarning}
+				warningText="That doesn't look like a typical Fajr time — it's usually early morning"
+			/>
 		</div>
-
-		{#if maghribWarning}
-			<p class="warning-text">That doesn't look like a typical Maghrib time — it's usually in the evening</p>
-		{/if}
-
-		{#if fajrWarning}
-			<p class="warning-text">That doesn't look like a typical Fajr time — it's usually early morning</p>
-		{/if}
 
 		{#if results}
 			<div class="results">
-				<div class="result">
-					<span class="label">End of Isha</span>
-					<div class="time-group">
-						<span class="time">{results.endOfIshaFormatted}</span>
-						<span class="relative">{getRelativeTime(results.endOfIsha, now)}</span>
-					</div>
-				</div>
-				<div class="result">
-					<span class="label">Last third begins</span>
-					<div class="time-group">
-						<span class="time">{results.lastThirdFormatted}</span>
-						<span class="relative">{getRelativeTime(results.lastThird, now)}</span>
-					</div>
-				</div>
+				<Result label="End of Isha" time={results.endOfIsha} {now} />
+				<Result label="Last third begins" time={results.lastThird} {now} />
 			</div>
 		{/if}
 	</div>
@@ -199,74 +130,11 @@
 		justify-content: center;
 	}
 
-	label {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		font-size: 0.95rem;
-	}
-
-	input[type='time'] {
-		font-family: inherit;
-		font-size: 1rem;
-		padding: 0.75rem;
-		border-radius: 0.5rem;
-		border: 2px solid transparent;
-		background: rgba(255, 255, 255, 0.15);
-		color: #fff;
-		width: 140px;
-		transition: border-color 0.2s;
-	}
-
-	input[type='time']:focus {
-		outline: none;
-		border-color: rgba(255, 255, 255, 0.5);
-	}
-
-	input[type='time'].warning {
-		border-color: #f59e0b;
-	}
-
-	.warning-text {
-		color: #fbbf24;
-		font-size: 0.85rem;
-		text-align: center;
-		margin-bottom: 0.5rem;
-	}
-
 	.results {
 		margin-top: 1.5rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-	}
-
-	.result {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 1rem;
-		background: rgba(255, 255, 255, 0.08);
-		border-radius: 0.5rem;
-	}
-
-	.result .label {
-		opacity: 0.8;
-	}
-
-	.time-group {
-		text-align: right;
-	}
-
-	.result .time {
-		font-weight: bold;
-		font-size: 1.2rem;
-	}
-
-	.result .relative {
-		display: block;
-		font-size: 0.8rem;
-		opacity: 0.6;
 	}
 
 	@media (max-width: 500px) {
@@ -277,21 +145,6 @@
 		.inputs {
 			flex-direction: column;
 			align-items: center;
-		}
-
-		input[type='time'] {
-			width: 100%;
-			max-width: 200px;
-		}
-
-		.result {
-			flex-direction: column;
-			gap: 0.25rem;
-			text-align: center;
-		}
-
-		.time-group {
-			text-align: center;
 		}
 	}
 </style>
