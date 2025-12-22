@@ -1,6 +1,20 @@
 <script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
+
 	let maghrib = '';
 	let fajr = '';
+	let now = new Date();
+	let interval: ReturnType<typeof setInterval>;
+
+	onMount(() => {
+		interval = setInterval(() => {
+			now = new Date();
+		}, 1000);
+	});
+
+	onDestroy(() => {
+		if (interval) clearInterval(interval);
+	});
 
 	// Validation ranges
 	const MAGHRIB_RANGE = { min: 13, max: 23 };
@@ -23,8 +37,16 @@
 	$: results = canCalculate ? calculateTimes(maghrib, fajr) : null;
 
 	function calculateTimes(maghribStr: string, fajrStr: string) {
-		const maghribTime = new Date(`2000-01-01T${maghribStr}`);
-		let fajrTime = new Date(`2000-01-01T${fajrStr}`);
+		// Use today's date for real-time comparison
+		const today = new Date();
+		const [maghribH, maghribM] = maghribStr.split(':').map(Number);
+		const [fajrH, fajrM] = fajrStr.split(':').map(Number);
+
+		const maghribTime = new Date(today);
+		maghribTime.setHours(maghribH, maghribM, 0, 0);
+
+		const fajrTime = new Date(today);
+		fajrTime.setHours(fajrH, fajrM, 0, 0);
 
 		// Fajr is next day if it's before Maghrib
 		if (fajrTime <= maghribTime) {
@@ -37,9 +59,28 @@
 		const lastThird = new Date(maghribTime.getTime() + diff * (2 / 3));
 
 		return {
-			endOfIsha: formatTime(endOfIsha),
-			lastThird: formatTime(lastThird)
+			endOfIsha,
+			lastThird,
+			endOfIshaFormatted: formatTime(endOfIsha),
+			lastThirdFormatted: formatTime(lastThird)
 		};
+	}
+
+	function getRelativeTime(target: Date, current: Date): string {
+		const diffMs = target.getTime() - current.getTime();
+		const absDiffMs = Math.abs(diffMs);
+
+		const hours = Math.floor(absDiffMs / (1000 * 60 * 60));
+		const minutes = Math.floor((absDiffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+		let timeStr = '';
+		if (hours > 0) {
+			timeStr = `${hours}h ${minutes}m`;
+		} else {
+			timeStr = `${minutes}m`;
+		}
+
+		return diffMs > 0 ? `in ${timeStr}` : `${timeStr} ago`;
 	}
 
 	function formatTime(date: Date): string {
@@ -85,11 +126,17 @@
 			<div class="results">
 				<div class="result">
 					<span class="label">End of Isha</span>
-					<span class="time">{results.endOfIsha}</span>
+					<div class="time-group">
+						<span class="time">{results.endOfIshaFormatted}</span>
+						<span class="relative">{getRelativeTime(results.endOfIsha, now)}</span>
+					</div>
 				</div>
 				<div class="result">
 					<span class="label">Last third begins</span>
-					<span class="time">{results.lastThird}</span>
+					<div class="time-group">
+						<span class="time">{results.lastThirdFormatted}</span>
+						<span class="relative">{getRelativeTime(results.lastThird, now)}</span>
+					</div>
 				</div>
 			</div>
 		{/if}
@@ -207,9 +254,19 @@
 		opacity: 0.8;
 	}
 
+	.time-group {
+		text-align: right;
+	}
+
 	.result .time {
 		font-weight: bold;
 		font-size: 1.2rem;
+	}
+
+	.result .relative {
+		display: block;
+		font-size: 0.8rem;
+		opacity: 0.6;
 	}
 
 	@media (max-width: 500px) {
@@ -230,6 +287,10 @@
 		.result {
 			flex-direction: column;
 			gap: 0.25rem;
+			text-align: center;
+		}
+
+		.time-group {
 			text-align: center;
 		}
 	}
