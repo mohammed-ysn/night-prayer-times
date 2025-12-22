@@ -9,12 +9,62 @@
 	let now = new Date();
 	let interval: ReturnType<typeof setInterval>;
 	let showInfo = false;
+	let lastSaved = '';
+
+	const MAX_AGE_DAYS = 3;
+
+	function formatSavedDate(dateStr: string): string {
+		const date = new Date(dateStr);
+		return date.toLocaleDateString('en-GB', {
+			day: 'numeric',
+			month: 'short',
+			hour: 'numeric',
+			minute: '2-digit',
+			hour12: true
+		});
+	}
 
 	onMount(() => {
+		// Load saved times if not too old
+		const savedDate = localStorage.getItem('savedDate');
+		if (savedDate) {
+			const daysSinceSave = Math.floor(
+				(Date.now() - new Date(savedDate).getTime()) / (1000 * 60 * 60 * 24)
+			);
+
+			if (daysSinceSave <= MAX_AGE_DAYS) {
+				maghrib = localStorage.getItem('maghrib') || '';
+				fajr = localStorage.getItem('fajr') || '';
+
+				if (maghrib || fajr) {
+					lastSaved = formatSavedDate(savedDate);
+				}
+			} else {
+				// Clear old data
+				localStorage.removeItem('maghrib');
+				localStorage.removeItem('fajr');
+				localStorage.removeItem('savedDate');
+			}
+		}
+
 		interval = setInterval(() => {
 			now = new Date();
 		}, 1000);
 	});
+
+	// Save times when they change
+	$: if (maghrib) {
+		const now = new Date().toISOString();
+		localStorage.setItem('maghrib', maghrib);
+		localStorage.setItem('savedDate', now);
+		lastSaved = formatSavedDate(now);
+	}
+	$: if (fajr) {
+		const now = new Date().toISOString();
+		localStorage.setItem('fajr', fajr);
+		localStorage.setItem('savedDate', now);
+		lastSaved = formatSavedDate(now);
+	}
 
 	onDestroy(() => {
 		if (interval) clearInterval(interval);
@@ -76,6 +126,10 @@
 				warningText="That doesn't look like a typical Fajr time — it's usually early morning"
 			/>
 		</div>
+
+		{#if lastSaved}
+			<p class="last-saved">Last saved: {lastSaved}</p>
+		{/if}
 
 		{#if results}
 			<div class="results">
@@ -180,6 +234,12 @@
 		gap: 1rem;
 		margin: 1.5rem 0;
 		justify-content: center;
+	}
+
+	.last-saved {
+		text-align: center;
+		font-size: 0.75rem;
+		opacity: 0.5;
 	}
 
 	.results {
