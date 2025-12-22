@@ -1,18 +1,22 @@
 # Night Prayer Times
 
-A simple website that calculates the time for the:
+A simple calculator for Islamic night prayer times. Enter Maghrib and Fajr times to calculate the end of Isha and the last third of the night.
 
-- End of Isha (one of the five daily prayers for Muslims)
-- Last third of the night (a recommended time to pray the night prayer)
+## Development
 
-## Link to website
+```bash
+npm install
+npm run dev
+```
 
-Click [here](https://mohammed-ysn.github.io/night-prayer-times/) to go to the website.
+## Build
+
+```bash
+npm run build
+```
+
+Outputs static files to `build/` for deployment to GitHub Pages.
 
 ## Credits
 
-- Prayer mat icon made by [Freepik](https://www.flaticon.com/authors/freepik) from [Flaticon](https://www.flaticon.com/)
-
-## Note
-
-The website assumes that Maghrib starts before 12 a.m. and that Fajr starts at 12 a.m. or after.
+Prayer mat icon made by [Freepik](https://www.flaticon.com/authors/freepik) from [Flaticon](https://www.flaticon.com/).
