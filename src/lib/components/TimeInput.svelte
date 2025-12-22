@@ -27,12 +27,14 @@
 	.time-input {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		gap: 0.5rem;
 	}
 
 	label {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		gap: 0.5rem;
 		font-size: 0.95rem;
 	}
@@ -64,10 +66,4 @@
 		text-align: center;
 	}
 
-	@media (max-width: 500px) {
-		input[type='time'] {
-			width: 100%;
-			max-width: 200px;
-		}
-	}
 </style>
