@@ -84,6 +84,11 @@
 			</div>
 		{/if}
 	</div>
+
+	<footer>
+		Found a bug? <a href="https://github.com/mohammed-ysn/night-prayer-times/issues" target="_blank" rel="noopener">Open an issue</a>
+		or <a href="mailto:mohammedysn15@gmail.com">email me</a>
+	</footer>
 </div>
 
 <style>
@@ -182,6 +187,21 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+
+	footer {
+		margin-top: 1.5rem;
+		text-align: center;
+		font-size: 0.8rem;
+		opacity: 0.5;
+	}
+
+	footer a {
+		color: inherit;
+	}
+
+	footer a:hover {
+		opacity: 1;
 	}
 
 	@media (max-width: 500px) {
