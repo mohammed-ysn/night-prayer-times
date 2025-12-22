@@ -8,6 +8,7 @@
 	let fajr = '';
 	let now = new Date();
 	let interval: ReturnType<typeof setInterval>;
+	let showInfo = false;
 
 	onMount(() => {
 		interval = setInterval(() => {
@@ -45,6 +46,17 @@
 
 <div class="container">
 	<h1>Night Prayer Times 🌙</h1>
+
+	<button class="info-toggle" onclick={() => (showInfo = !showInfo)}>
+		{showInfo ? 'Hide info ▲' : "What's this? ▼"}
+	</button>
+
+	{#if showInfo}
+		<div class="info-panel">
+			<p><strong>End of Isha</strong> - The midpoint between Maghrib and Fajr. One opinion for when Isha prayer time ends.</p>
+			<p><strong>Last third</strong> - The final third of the night. A recommended time for night prayers (Tahajjud).</p>
+		</div>
+	{/if}
 
 	<div class="card">
 		<p class="description">Enter Maghrib and the following morning's Fajr</p>
@@ -121,6 +133,41 @@
 		font-size: 0.85rem;
 		opacity: 0.6;
 		line-height: 1.4;
+	}
+
+	.info-toggle {
+		display: block;
+		margin: 0 auto 1rem;
+		background: none;
+		border: none;
+		color: rgba(255, 255, 255, 0.5);
+		font-family: inherit;
+		font-size: 0.8rem;
+		cursor: pointer;
+		padding: 0.25rem 0.5rem;
+	}
+
+	.info-toggle:hover {
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	.info-panel {
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 0.5rem;
+		padding: 1rem;
+		margin-bottom: 1rem;
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+
+	.info-panel p {
+		margin-bottom: 0.5rem;
+		opacity: 0.8;
+	}
+
+	.info-panel p:last-child {
+		margin-bottom: 0;
 	}
 
 	.inputs {
