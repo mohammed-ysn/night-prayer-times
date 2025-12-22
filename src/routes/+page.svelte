@@ -59,10 +59,7 @@
 	<h1>Night Prayer Times 🌙</h1>
 
 	<div class="card">
-		<p class="description">
-			Enter the times for Maghrib and the following Fajr to calculate the end of Isha and the
-			last third of the night.
-		</p>
+		<p class="description">Enter Maghrib and the following morning's Fajr</p>
 
 		<div class="inputs">
 			<label>
@@ -77,23 +74,25 @@
 		</div>
 
 		{#if maghribWarning}
-			<p class="warning-text">Please check that the time for Maghrib is correct</p>
+			<p class="warning-text">That doesn't look like a typical Maghrib time — it's usually in the evening</p>
 		{/if}
 
 		{#if fajrWarning}
-			<p class="warning-text">Please check that the time for Fajr is correct</p>
+			<p class="warning-text">That doesn't look like a typical Fajr time — it's usually early morning</p>
 		{/if}
 
-		<div class="results" class:visible={results}>
-			<div class="result">
-				<span class="label">End of Isha</span>
-				<span class="time">{results?.endOfIsha ?? '—'}</span>
+		{#if results}
+			<div class="results">
+				<div class="result">
+					<span class="label">End of Isha</span>
+					<span class="time">{results.endOfIsha}</span>
+				</div>
+				<div class="result">
+					<span class="label">Last third begins</span>
+					<span class="time">{results.lastThird}</span>
+				</div>
 			</div>
-			<div class="result">
-				<span class="label">Last third begins</span>
-				<span class="time">{results?.lastThird ?? '—'}</span>
-			</div>
-		</div>
+		{/if}
 	</div>
 </div>
 
@@ -141,8 +140,9 @@
 
 	.description {
 		text-align: center;
-		opacity: 0.9;
-		line-height: 1.5;
+		font-size: 0.85rem;
+		opacity: 0.6;
+		line-height: 1.4;
 	}
 
 	.inputs {
@@ -192,16 +192,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		opacity: 0;
-		transform: translateY(10px);
-		transition:
-			opacity 0.3s,
-			transform 0.3s;
-	}
-
-	.results.visible {
-		opacity: 1;
-		transform: translateY(0);
 	}
 
 	.result {
