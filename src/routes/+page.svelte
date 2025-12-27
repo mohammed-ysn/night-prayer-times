@@ -152,6 +152,10 @@
 		box-sizing: border-box;
 	}
 
+	:global(html) {
+		background: #0f2027;
+	}
+
 	:global(body) {
 		font-family: 'Roboto Mono', monospace;
 		font-size: 1.1rem;
@@ -162,6 +166,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 2rem 1rem;
+		overscroll-behavior: none;
 	}
 
 	.container {
