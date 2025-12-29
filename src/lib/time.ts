@@ -4,19 +4,26 @@ export interface PrayerTimes {
 }
 
 export function calculateTimes(maghribStr: string, fajrStr: string): PrayerTimes {
-	const today = new Date();
+	const now = new Date();
 	const [maghribH, maghribM] = maghribStr.split(':').map(Number);
 	const [fajrH, fajrM] = fajrStr.split(':').map(Number);
 
-	const maghribTime = new Date(today);
+	const maghribTime = new Date(now);
 	maghribTime.setHours(maghribH, maghribM, 0, 0);
 
-	const fajrTime = new Date(today);
+	const fajrTime = new Date(now);
 	fajrTime.setHours(fajrH, fajrM, 0, 0);
 
 	// Fajr is next day if it's before Maghrib
 	if (fajrTime <= maghribTime) {
 		fajrTime.setDate(fajrTime.getDate() + 1);
+	}
+
+	// If current time is before Fajr but after midnight, we're in the "night" period
+	// and should use yesterday's Maghrib as the start
+	if (now < fajrTime && now.getHours() < 12 && maghribTime > now) {
+		maghribTime.setDate(maghribTime.getDate() - 1);
+		fajrTime.setDate(fajrTime.getDate() - 1);
 	}
 
 	const diff = fajrTime.getTime() - maghribTime.getTime();
