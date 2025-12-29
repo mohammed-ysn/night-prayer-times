@@ -398,7 +398,7 @@
 	}
 
 	.info-panel.open {
-		max-height: 200px;
+		max-height: 300px;
 		opacity: 1;
 		margin-bottom: 1rem;
 	}
