@@ -12,7 +12,7 @@
 	let lastSaved = '';
 	let mounted = false;
 
-	const MAX_AGE_DAYS = 3;
+	const MAX_AGE_DAYS = 30;
 
 	function formatSavedDate(dateStr: string): string {
 		const date = new Date(dateStr);
