@@ -68,11 +68,17 @@
 		initPrayerTimes().then(() => {
 			if (getManualModePreference()) switchToManual();
 		});
-		interval = setInterval(() => { now = new Date(); }, 1000);
-		setTimeout(() => { mounted = true; }, 100);
+		interval = setInterval(() => {
+			now = new Date();
+		}, 1000);
+		setTimeout(() => {
+			mounted = true;
+		}, 100);
 	});
 
-	onDestroy(() => { if (interval) clearInterval(interval); });
+	onDestroy(() => {
+		if (interval) clearInterval(interval);
+	});
 
 	// Persist manual edits
 	$: if (maghrib && manualMode) {
@@ -84,7 +90,7 @@
 
 	$: canCalculate = maghrib && fajr;
 	$: results = canCalculate ? calculateTimes(maghrib, fajr) : null;
-	$: londonDate = new Date().toLocaleDateString('en-GB', {
+	const londonDate = new Date().toLocaleDateString('en-GB', {
 		day: 'numeric',
 		month: 'short',
 		year: 'numeric'
@@ -113,7 +119,6 @@
 	<div class="card">
 		{#if loading}
 			<p class="status-text loading">Fetching today's times...</p>
-
 		{:else if autoFetched && !manualMode}
 			<p class="status-text success">📍 London · {londonDate}</p>
 
@@ -133,7 +138,6 @@
 					<span class="arrow">→</span>
 				</button>
 			</div>
-
 		{:else}
 			{#if autoFetched}
 				<button class="back-btn" onclick={switchToLondon}>
@@ -166,7 +170,11 @@
 	<footer>
 		<p>Found a bug?</p>
 		<div class="footer-links">
-			<a href="https://github.com/mohammed-ysn/night-prayer-times/issues" target="_blank" rel="noopener">
+			<a
+				href="https://github.com/mohammed-ysn/night-prayer-times/issues"
+				target="_blank"
+				rel="noopener"
+			>
 				<span>📝</span> Open an issue
 			</a>
 			<span class="footer-divider">•</span>
@@ -223,10 +231,10 @@
 	.stars-1 {
 		background-image:
 			radial-gradient(1px 1px at 20px 30px, white, transparent),
-			radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
-			radial-gradient(1px 1px at 50px 160px, rgba(255,255,255,0.6), transparent),
+			radial-gradient(1px 1px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+			radial-gradient(1px 1px at 50px 160px, rgba(255, 255, 255, 0.6), transparent),
 			radial-gradient(1px 1px at 90px 40px, white, transparent),
-			radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), transparent),
+			radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.7), transparent),
 			radial-gradient(1.5px 1.5px at 160px 120px, white, transparent);
 		background-size: 200px 200px;
 		animation: twinkle 4s ease-in-out infinite;
@@ -234,10 +242,10 @@
 
 	.stars-2 {
 		background-image:
-			radial-gradient(1px 1px at 75px 45px, rgba(255,255,255,0.7), transparent),
+			radial-gradient(1px 1px at 75px 45px, rgba(255, 255, 255, 0.7), transparent),
 			radial-gradient(1px 1px at 95px 95px, white, transparent),
-			radial-gradient(1.5px 1.5px at 145px 25px, rgba(255,255,255,0.6), transparent),
-			radial-gradient(1px 1px at 175px 145px, rgba(255,255,255,0.8), transparent),
+			radial-gradient(1.5px 1.5px at 145px 25px, rgba(255, 255, 255, 0.6), transparent),
+			radial-gradient(1px 1px at 175px 145px, rgba(255, 255, 255, 0.8), transparent),
 			radial-gradient(1px 1px at 15px 125px, white, transparent);
 		background-size: 200px 200px;
 		animation: twinkle 5s ease-in-out infinite 1s;
@@ -245,16 +253,21 @@
 
 	.stars-3 {
 		background-image:
-			radial-gradient(1.5px 1.5px at 55px 115px, rgba(255,255,255,0.5), transparent),
-			radial-gradient(1px 1px at 115px 175px, rgba(255,255,255,0.7), transparent),
+			radial-gradient(1.5px 1.5px at 55px 115px, rgba(255, 255, 255, 0.5), transparent),
+			radial-gradient(1px 1px at 115px 175px, rgba(255, 255, 255, 0.7), transparent),
 			radial-gradient(1px 1px at 185px 75px, white, transparent);
 		background-size: 200px 200px;
 		animation: twinkle 6s ease-in-out infinite 2s;
 	}
 
 	@keyframes twinkle {
-		0%, 100% { opacity: 0.5; }
-		50% { opacity: 1; }
+		0%,
+		100% {
+			opacity: 0.5;
+		}
+		50% {
+			opacity: 1;
+		}
 	}
 
 	.container {
@@ -264,7 +277,9 @@
 		z-index: 1;
 		opacity: 0;
 		transform: translateY(20px);
-		transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+		transition:
+			opacity 0.6s ease-out,
+			transform 0.6s ease-out;
 	}
 
 	.container.mounted {
@@ -285,8 +300,13 @@
 	}
 
 	@keyframes float {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-8px); }
+		0%,
+		100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-8px);
+		}
 	}
 
 	h1 {
@@ -494,10 +514,21 @@
 	}
 
 	@media (max-width: 500px) {
-		h1 { font-size: 1.6rem; }
-		.moon-icon { font-size: 2.5rem; }
-		.card { padding: 1.5rem; }
-		.footer-links { flex-direction: column; gap: 0.5rem; }
-		.footer-divider { display: none; }
+		h1 {
+			font-size: 1.6rem;
+		}
+		.moon-icon {
+			font-size: 2.5rem;
+		}
+		.card {
+			padding: 1.5rem;
+		}
+		.footer-links {
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+		.footer-divider {
+			display: none;
+		}
 	}
 </style>

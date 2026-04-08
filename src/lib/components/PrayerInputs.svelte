@@ -16,8 +16,7 @@
 	let fajrHour = $derived(fajr ? new Date(`2000-01-01T${fajr}`).getHours() : null);
 
 	let maghribWarning = $derived(
-		maghribHour !== null &&
-			(maghribHour < MAGHRIB_RANGE.min || maghribHour > MAGHRIB_RANGE.max)
+		maghribHour !== null && (maghribHour < MAGHRIB_RANGE.min || maghribHour > MAGHRIB_RANGE.max)
 	);
 	let fajrWarning = $derived(
 		fajrHour !== null && (fajrHour < FAJR_RANGE.min || fajrHour > FAJR_RANGE.max)
