@@ -1,14 +1,22 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { calculateTimes } from '$lib/time';
-	import TimeInput from '$lib/components/TimeInput.svelte';
+	import { fetchLondonTimes, getCachedLondonTimes } from '$lib/api';
+	import {
+		loadManualTimes,
+		saveManualTime,
+		formatSavedDate,
+		getManualModePreference,
+		setManualModePreference
+	} from '$lib/storage';
+	import InfoPanel from '$lib/components/InfoPanel.svelte';
+	import PrayerInputs from '$lib/components/PrayerInputs.svelte';
 	import Result from '$lib/components/Result.svelte';
 
 	let maghrib = '';
 	let fajr = '';
 	let now = new Date();
 	let interval: ReturnType<typeof setInterval>;
-	let showInfo = false;
 	let lastSaved = '';
 	let mounted = false;
 	let loading = false;
@@ -16,176 +24,66 @@
 	let autoFetched = false;
 	let manualMode = false;
 
-	const MAX_AGE_DAYS = 30;
-
-	function todayStr(): string {
-		return new Date().toISOString().split('T')[0];
-	}
-
-	function tomorrowStr(): string {
-		const d = new Date();
-		d.setDate(d.getDate() + 1);
-		return d.toISOString().split('T')[0];
-	}
-
-	async function fetchPrayerTimes() {
+	async function initPrayerTimes() {
 		loading = true;
 		fetchError = '';
 		try {
-			const today = todayStr();
-
-			// Use cached values if already fetched today
-			if (localStorage.getItem('apiDate') === today) {
-				const m = localStorage.getItem('apiMaghrib');
-				const f = localStorage.getItem('apiFajr');
-				if (m && f) {
-					maghrib = m;
-					fajr = f;
-					autoFetched = true;
-					return;
-				}
-			}
-
-			const tomorrow = tomorrowStr();
-			const key = '2a99f189-6e3b-4015-8fb8-ff277642561d';
-			const [todayRes, tomorrowRes] = await Promise.all([
-				fetch(
-					`https://www.londonprayertimes.com/api/times/?format=json&key=${key}&date=${today}&24hours=true`
-				),
-				fetch(
-					`https://www.londonprayertimes.com/api/times/?format=json&key=${key}&date=${tomorrow}&24hours=true`
-				)
-			]);
-
-			if (!todayRes.ok || !tomorrowRes.ok) throw new Error('API error');
-
-			const todayData = await todayRes.json();
-			const tomorrowData = await tomorrowRes.json();
-
-			const m: string = todayData.magrib || todayData.maghrib;
-			const f: string = tomorrowData.fajr;
-
-			if (!m || !f) throw new Error('Unexpected response format');
-
-			maghrib = m;
-			fajr = f;
-
-			localStorage.setItem('apiDate', today);
-			localStorage.setItem('apiMaghrib', m);
-			localStorage.setItem('apiFajr', f);
+			const times = await fetchLondonTimes();
+			maghrib = times.maghrib;
+			fajr = times.fajr;
 			autoFetched = true;
 		} catch {
 			fetchError = 'Could not fetch prayer times — enter times manually.';
-			loadSaved();
+			const saved = loadManualTimes();
+			if (saved) {
+				maghrib = saved.maghrib;
+				fajr = saved.fajr;
+				lastSaved = formatSavedDate(saved.savedDate);
+			}
 		} finally {
 			loading = false;
 		}
 	}
 
-	function loadSaved() {
-		const savedDate = localStorage.getItem('savedDate');
-		if (!savedDate) return;
-		const age = Math.floor((Date.now() - new Date(savedDate).getTime()) / 86400000);
-		if (age > MAX_AGE_DAYS) {
-			localStorage.removeItem('maghrib');
-			localStorage.removeItem('fajr');
-			localStorage.removeItem('savedDate');
-			return;
-		}
-		maghrib = localStorage.getItem('maghrib') || '';
-		fajr = localStorage.getItem('fajr') || '';
-		if (maghrib || fajr) lastSaved = formatSavedDate(savedDate);
-	}
-
 	function switchToManual() {
 		manualMode = true;
-		localStorage.setItem('preferManual', 'true');
-		// Load previously saved manual times, or start fresh
-		const savedMag = localStorage.getItem('maghrib');
-		const savedFaj = localStorage.getItem('fajr');
-		const savedDate = localStorage.getItem('savedDate');
-		maghrib = savedMag || '';
-		fajr = savedFaj || '';
-		if ((savedMag || savedFaj) && savedDate) {
-			lastSaved = formatSavedDate(savedDate);
-		} else {
-			lastSaved = '';
-		}
+		setManualModePreference(true);
+		const saved = loadManualTimes();
+		maghrib = saved?.maghrib ?? '';
+		fajr = saved?.fajr ?? '';
+		lastSaved = saved ? formatSavedDate(saved.savedDate) : '';
 	}
 
 	function switchToLondon() {
 		manualMode = false;
-		localStorage.removeItem('preferManual');
-		const m = localStorage.getItem('apiMaghrib');
-		const f = localStorage.getItem('apiFajr');
-		if (m && f) {
-			maghrib = m;
-			fajr = f;
+		setManualModePreference(false);
+		const cached = getCachedLondonTimes();
+		if (cached) {
+			maghrib = cached.maghrib;
+			fajr = cached.fajr;
 		}
 	}
 
-	function formatSavedDate(dateStr: string): string {
-		const date = new Date(dateStr);
-		return date.toLocaleDateString('en-GB', {
-			day: 'numeric',
-			month: 'short',
-			hour: 'numeric',
-			minute: '2-digit',
-			hour12: true
-		});
-	}
-
 	onMount(() => {
-		fetchPrayerTimes().then(() => {
-			if (localStorage.getItem('preferManual') === 'true') {
-				switchToManual();
-			}
+		initPrayerTimes().then(() => {
+			if (getManualModePreference()) switchToManual();
 		});
-
-		interval = setInterval(() => {
-			now = new Date();
-		}, 1000);
-
-		setTimeout(() => {
-			mounted = true;
-		}, 100);
+		interval = setInterval(() => { now = new Date(); }, 1000);
+		setTimeout(() => { mounted = true; }, 100);
 	});
 
-	// Save manual edits to localStorage
+	onDestroy(() => { if (interval) clearInterval(interval); });
+
+	// Persist manual edits
 	$: if (maghrib && manualMode) {
-		const ts = new Date().toISOString();
-		localStorage.setItem('maghrib', maghrib);
-		localStorage.setItem('savedDate', ts);
-		lastSaved = formatSavedDate(ts);
+		lastSaved = formatSavedDate(saveManualTime('maghrib', maghrib));
 	}
 	$: if (fajr && manualMode) {
-		const ts = new Date().toISOString();
-		localStorage.setItem('fajr', fajr);
-		localStorage.setItem('savedDate', ts);
-		lastSaved = formatSavedDate(ts);
+		lastSaved = formatSavedDate(saveManualTime('fajr', fajr));
 	}
-
-	onDestroy(() => {
-		if (interval) clearInterval(interval);
-	});
-
-	// Validation ranges
-	const MAGHRIB_RANGE = { min: 13, max: 23 };
-	const FAJR_RANGE = { min: 0, max: 8 };
-
-	$: maghribHour = maghrib ? new Date(`2000-01-01T${maghrib}`).getHours() : null;
-	$: fajrHour = fajr ? new Date(`2000-01-01T${fajr}`).getHours() : null;
-
-	$: maghribWarning =
-		maghribHour !== null &&
-		(maghribHour < MAGHRIB_RANGE.min || maghribHour > MAGHRIB_RANGE.max);
-
-	$: fajrWarning =
-		fajrHour !== null && (fajrHour < FAJR_RANGE.min || fajrHour > FAJR_RANGE.max);
 
 	$: canCalculate = maghrib && fajr;
 	$: results = canCalculate ? calculateTimes(maghrib, fajr) : null;
-
 	$: londonDate = new Date().toLocaleDateString('en-GB', {
 		day: 'numeric',
 		month: 'short',
@@ -197,7 +95,6 @@
 	<title>Night Prayer Times</title>
 </svelte:head>
 
-<!-- Animated stars background -->
 <div class="stars-container">
 	<div class="stars stars-1"></div>
 	<div class="stars stars-2"></div>
@@ -211,59 +108,16 @@
 		<p class="subtitle">Calculate your night prayer schedule</p>
 	</header>
 
-	<button class="info-toggle" onclick={() => (showInfo = !showInfo)}>
-		<span class="info-icon">ℹ️</span>
-		{showInfo ? 'Hide info' : "What's this?"}
-		<span class="chevron" class:open={showInfo}>›</span>
-	</button>
-
-	<div class="info-panel" class:open={showInfo}>
-		<div class="info-item">
-			<span class="info-label">End of Isha</span>
-			<p>The midpoint between Maghrib and Fajr. One opinion for when Isha prayer time ends.</p>
-		</div>
-		<div class="info-item">
-			<span class="info-label">Last third</span>
-			<p>The final third of the night. A recommended time for night prayers (Tahajjud).</p>
-		</div>
-	</div>
+	<InfoPanel />
 
 	<div class="card">
 		{#if loading}
 			<p class="status-text loading">Fetching today's times...</p>
 
 		{:else if autoFetched && !manualMode}
-			<!-- London mode -->
 			<p class="status-text success">📍 London · {londonDate}</p>
 
-			<div class="inputs">
-				<TimeInput label="Maghrib" bind:value={maghrib} warning={maghribWarning} />
-
-				<div class="input-divider">
-					<span class="divider-dot"></span>
-					<span class="divider-line"></span>
-					<span class="divider-dot"></span>
-				</div>
-
-				<TimeInput label="Fajr (tomorrow)" bind:value={fajr} warning={fajrWarning} />
-			</div>
-
-			{#if maghribWarning || fajrWarning}
-				<div class="warnings">
-					{#if maghribWarning}
-						<div class="warning-banner">
-							<span class="warning-icon">⚠️</span>
-							<p>That doesn't look like a typical Maghrib time — it's usually in the evening</p>
-						</div>
-					{/if}
-					{#if fajrWarning}
-						<div class="warning-banner">
-							<span class="warning-icon">⚠️</span>
-							<p>That doesn't look like a typical Fajr time — it's usually early morning</p>
-						</div>
-					{/if}
-				</div>
-			{/if}
+			<PrayerInputs bind:maghrib bind:fajr />
 
 			{#if results}
 				<div class="results">
@@ -281,7 +135,6 @@
 			</div>
 
 		{:else}
-			<!-- Manual mode -->
 			{#if autoFetched}
 				<button class="back-btn" onclick={switchToLondon}>
 					<span class="back-arrow">←</span> London times
@@ -293,44 +146,12 @@
 				</div>
 			{/if}
 
-			<p class="description" class:has-back={autoFetched}>
-				Enter Maghrib and the following morning's Fajr
-			</p>
+			<p class="description">Enter Maghrib and the following morning's Fajr</p>
 
-			<div class="inputs">
-				<TimeInput label="Maghrib" bind:value={maghrib} warning={maghribWarning} />
-
-				<div class="input-divider">
-					<span class="divider-dot"></span>
-					<span class="divider-line"></span>
-					<span class="divider-dot"></span>
-				</div>
-
-				<TimeInput label="Fajr (tomorrow)" bind:value={fajr} warning={fajrWarning} />
-			</div>
-
-			{#if maghribWarning || fajrWarning}
-				<div class="warnings">
-					{#if maghribWarning}
-						<div class="warning-banner">
-							<span class="warning-icon">⚠️</span>
-							<p>That doesn't look like a typical Maghrib time — it's usually in the evening</p>
-						</div>
-					{/if}
-					{#if fajrWarning}
-						<div class="warning-banner">
-							<span class="warning-icon">⚠️</span>
-							<p>That doesn't look like a typical Fajr time — it's usually early morning</p>
-						</div>
-					{/if}
-				</div>
-			{/if}
+			<PrayerInputs bind:maghrib bind:fajr />
 
 			{#if lastSaved}
-				<p class="last-saved">
-					<span class="save-icon">💾</span>
-					Last saved: {lastSaved}
-				</p>
+				<p class="last-saved"><span>💾</span> Last saved: {lastSaved}</p>
 			{/if}
 
 			{#if results}
@@ -349,9 +170,7 @@
 				<span>📝</span> Open an issue
 			</a>
 			<span class="footer-divider">•</span>
-			<a href="mailto:mohammedysn15@gmail.com">
-				<span>✉️</span> Email me
-			</a>
+			<a href="mailto:mohammedysn15@gmail.com"><span>✉️</span> Email me</a>
 		</div>
 	</footer>
 </div>
@@ -381,7 +200,6 @@
 		overflow-x: hidden;
 	}
 
-	/* Animated starry background */
 	.stars-container {
 		position: fixed;
 		top: 0;
@@ -501,7 +319,6 @@
 			inset 0 1px 0 rgba(255, 255, 255, 0.1);
 	}
 
-	/* Status line (loading / London badge) */
 	.status-text {
 		text-align: center;
 		font-size: 0.85rem;
@@ -517,47 +334,13 @@
 		letter-spacing: 0.2px;
 	}
 
-	/* "Not in London?" prompt */
-	.location-prompt {
-		margin-top: 1.75rem;
+	.description {
+		text-align: center;
+		font-size: 0.85rem;
+		color: rgba(255, 255, 255, 0.5);
+		line-height: 1.4;
 	}
 
-	.location-divider {
-		height: 1px;
-		background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
-		margin-bottom: 1rem;
-	}
-
-	.location-link {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.4rem;
-		width: 100%;
-		background: none;
-		border: none;
-		font-family: inherit;
-		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.35);
-		cursor: pointer;
-		padding: 0.25rem;
-		transition: color 0.2s ease;
-	}
-
-	.location-link:hover {
-		color: rgba(255, 255, 255, 0.7);
-	}
-
-	.location-link .arrow {
-		transition: transform 0.2s ease;
-		display: inline-block;
-	}
-
-	.location-link:hover .arrow {
-		transform: translateX(3px);
-	}
-
-	/* "← London times" back button */
 	.back-btn {
 		display: inline-flex;
 		align-items: center;
@@ -581,150 +364,12 @@
 	}
 
 	.back-arrow {
-		transition: transform 0.2s ease;
 		display: inline-block;
+		transition: transform 0.2s ease;
 	}
 
 	.back-btn:hover .back-arrow {
 		transform: translateX(-3px);
-	}
-
-	.description {
-		text-align: center;
-		font-size: 0.85rem;
-		color: rgba(255, 255, 255, 0.5);
-		line-height: 1.4;
-	}
-
-	.description.has-back {
-		margin-top: 0;
-	}
-
-	.info-toggle {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		margin: 0 auto 1rem;
-		background: rgba(255, 255, 255, 0.05);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 2rem;
-		color: rgba(255, 255, 255, 0.6);
-		font-family: inherit;
-		font-size: 0.8rem;
-		cursor: pointer;
-		padding: 0.5rem 1rem;
-		transition: all 0.3s ease;
-	}
-
-	.info-toggle:hover {
-		background: rgba(255, 255, 255, 0.1);
-		color: rgba(255, 255, 255, 0.9);
-		border-color: rgba(255, 255, 255, 0.2);
-	}
-
-	.info-icon {
-		font-size: 0.9rem;
-	}
-
-	.chevron {
-		font-size: 1rem;
-		transition: transform 0.3s ease;
-		transform: rotate(90deg);
-	}
-
-	.chevron.open {
-		transform: rotate(-90deg);
-	}
-
-	.info-panel {
-		max-height: 0;
-		overflow: hidden;
-		opacity: 0;
-		transition: all 0.4s ease;
-		margin-bottom: 0;
-	}
-
-	.info-panel.open {
-		max-height: 300px;
-		opacity: 1;
-		margin-bottom: 1rem;
-	}
-
-	.info-item {
-		background: rgba(100, 150, 255, 0.08);
-		border: 1px solid rgba(100, 150, 255, 0.15);
-		border-radius: 0.75rem;
-		padding: 1rem;
-		margin-bottom: 0.5rem;
-	}
-
-	.info-item:last-child {
-		margin-bottom: 0;
-	}
-
-	.info-label {
-		display: block;
-		font-size: 0.9rem;
-		font-weight: 600;
-		color: rgba(180, 200, 255, 0.9);
-		margin-bottom: 0.25rem;
-	}
-
-	.info-item p {
-		font-size: 0.8rem;
-		color: rgba(255, 255, 255, 0.6);
-		line-height: 1.4;
-	}
-
-	.inputs {
-		display: flex;
-		gap: 1rem;
-		margin: 1.5rem 0;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.input-divider {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.25rem;
-		opacity: 0.3;
-	}
-
-	.divider-dot {
-		width: 4px;
-		height: 4px;
-		background: white;
-		border-radius: 50%;
-	}
-
-	.divider-line {
-		width: 1px;
-		height: 24px;
-		background: linear-gradient(to bottom, transparent, white, transparent);
-	}
-
-	.last-saved {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		text-align: center;
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.4);
-	}
-
-	.save-icon {
-		font-size: 0.8rem;
-	}
-
-	.warnings {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		margin-bottom: 1rem;
 	}
 
 	.warning-banner {
@@ -755,6 +400,54 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
+	}
+
+	.last-saved {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.location-prompt {
+		margin-top: 1.75rem;
+	}
+
+	.location-divider {
+		height: 1px;
+		background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+		margin-bottom: 1rem;
+	}
+
+	.location-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		width: 100%;
+		background: none;
+		border: none;
+		font-family: inherit;
+		font-size: 0.8rem;
+		color: rgba(255, 255, 255, 0.35);
+		cursor: pointer;
+		padding: 0.25rem;
+		transition: color 0.2s ease;
+	}
+
+	.location-link:hover {
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.arrow {
+		display: inline-block;
+		transition: transform 0.2s ease;
+	}
+
+	.location-link:hover .arrow {
+		transform: translateX(3px);
 	}
 
 	footer {
@@ -801,41 +494,10 @@
 	}
 
 	@media (max-width: 500px) {
-		h1 {
-			font-size: 1.6rem;
-		}
-
-		.moon-icon {
-			font-size: 2.5rem;
-		}
-
-		.inputs {
-			flex-direction: column;
-			align-items: center;
-		}
-
-		.input-divider {
-			flex-direction: row;
-			gap: 0.5rem;
-		}
-
-		.divider-line {
-			width: 24px;
-			height: 1px;
-			background: linear-gradient(to right, transparent, white, transparent);
-		}
-
-		.card {
-			padding: 1.5rem;
-		}
-
-		.footer-links {
-			flex-direction: column;
-			gap: 0.5rem;
-		}
-
-		.footer-divider {
-			display: none;
-		}
+		h1 { font-size: 1.6rem; }
+		.moon-icon { font-size: 2.5rem; }
+		.card { padding: 1.5rem; }
+		.footer-links { flex-direction: column; gap: 0.5rem; }
+		.footer-divider { display: none; }
 	}
 </style>
