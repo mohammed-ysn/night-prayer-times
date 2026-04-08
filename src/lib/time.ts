@@ -48,12 +48,15 @@ export function getRelativeTime(target: Date, current: Date): string {
 
 	const hours = Math.floor(absDiffMs / (1000 * 60 * 60));
 	const minutes = Math.floor((absDiffMs % (1000 * 60 * 60)) / (1000 * 60));
+	const seconds = Math.floor((absDiffMs % (1000 * 60)) / 1000);
 
 	let timeStr = '';
 	if (hours > 0) {
 		timeStr = `${hours}h ${minutes}m`;
-	} else {
+	} else if (minutes >= 10) {
 		timeStr = `${minutes}m`;
+	} else {
+		timeStr = `${minutes}m ${seconds}s`;
 	}
 
 	return diffMs > 0 ? `in ${timeStr}` : `${timeStr} ago`;
