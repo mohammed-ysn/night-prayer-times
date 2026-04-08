@@ -11,8 +11,89 @@
 	let showInfo = false;
 	let lastSaved = '';
 	let mounted = false;
+	let loading = false;
+	let fetchError = '';
+	let autoFetched = false;
 
 	const MAX_AGE_DAYS = 30;
+
+	function todayStr(): string {
+		return new Date().toISOString().split('T')[0];
+	}
+
+	function tomorrowStr(): string {
+		const d = new Date();
+		d.setDate(d.getDate() + 1);
+		return d.toISOString().split('T')[0];
+	}
+
+	async function fetchPrayerTimes() {
+		loading = true;
+		fetchError = '';
+		try {
+			const today = todayStr();
+
+			// Use cached values if already fetched today
+			if (localStorage.getItem('apiDate') === today) {
+				const m = localStorage.getItem('apiMaghrib');
+				const f = localStorage.getItem('apiFajr');
+				if (m && f) {
+					maghrib = m;
+					fajr = f;
+					autoFetched = true;
+					return;
+				}
+			}
+
+			const tomorrow = tomorrowStr();
+			const [todayRes, tomorrowRes] = await Promise.all([
+				fetch(
+					`https://www.londonprayertimes.com/api/times/?format=json&key=2a99f189-6e3b-4015-8fb8-ff277642561d&date=${today}&24hours=true`
+				),
+				fetch(
+					`https://www.londonprayertimes.com/api/times/?format=json&key=2a99f189-6e3b-4015-8fb8-ff277642561d&date=${tomorrow}&24hours=true`
+				)
+			]);
+
+			if (!todayRes.ok || !tomorrowRes.ok) throw new Error('API error');
+
+			const todayData = await todayRes.json();
+			const tomorrowData = await tomorrowRes.json();
+
+			const m: string = todayData.magrib || todayData.maghrib;
+			const f: string = tomorrowData.fajr;
+
+			if (!m || !f) throw new Error('Unexpected response format');
+
+			maghrib = m;
+			fajr = f;
+
+			localStorage.setItem('apiDate', today);
+			localStorage.setItem('apiMaghrib', m);
+			localStorage.setItem('apiFajr', f);
+			autoFetched = true;
+		} catch {
+			fetchError = 'Could not fetch prayer times — enter times manually.';
+			loadSaved();
+		} finally {
+			loading = false;
+		}
+	}
+
+	function loadSaved() {
+		const savedDate = localStorage.getItem('savedDate');
+		if (!savedDate) return;
+		const age = Math.floor((Date.now() - new Date(savedDate).getTime()) / 86400000);
+		if (age > MAX_AGE_DAYS) {
+			localStorage.removeItem('maghrib');
+			localStorage.removeItem('fajr');
+			localStorage.removeItem('savedDate');
+			return;
+		}
+		maghrib = localStorage.getItem('maghrib') || '';
+		fajr = localStorage.getItem('fajr') || '';
+		if (maghrib || fajr) lastSaved = formatSavedDate(savedDate);
+	}
 
 	function formatSavedDate(dateStr: string): string {
 		const date = new Date(dateStr);
@@ -26,50 +107,29 @@
 	}
 
 	onMount(() => {
-		// Load saved times if not too old
-		const savedDate = localStorage.getItem('savedDate');
-		if (savedDate) {
-			const daysSinceSave = Math.floor(
-				(Date.now() - new Date(savedDate).getTime()) / (1000 * 60 * 60 * 24)
-			);
-
-			if (daysSinceSave <= MAX_AGE_DAYS) {
-				maghrib = localStorage.getItem('maghrib') || '';
-				fajr = localStorage.getItem('fajr') || '';
-
-				if (maghrib || fajr) {
-					lastSaved = formatSavedDate(savedDate);
-				}
-			} else {
-				// Clear old data
-				localStorage.removeItem('maghrib');
-				localStorage.removeItem('fajr');
-				localStorage.removeItem('savedDate');
-			}
-		}
+		fetchPrayerTimes();
 
 		interval = setInterval(() => {
 			now = new Date();
 		}, 1000);
 
-		// Trigger entrance animations
 		setTimeout(() => {
 			mounted = true;
 		}, 100);
 	});
 
-	// Save times when they change
-	$: if (maghrib) {
-		const now = new Date().toISOString();
+	// Save manual edits to localStorage
+	$: if (maghrib && !autoFetched) {
+		const ts = new Date().toISOString();
 		localStorage.setItem('maghrib', maghrib);
-		localStorage.setItem('savedDate', now);
-		lastSaved = formatSavedDate(now);
+		localStorage.setItem('savedDate', ts);
+		lastSaved = formatSavedDate(ts);
 	}
-	$: if (fajr) {
-		const now = new Date().toISOString();
+	$: if (fajr && !autoFetched) {
+		const ts = new Date().toISOString();
 		localStorage.setItem('fajr', fajr);
-		localStorage.setItem('savedDate', now);
-		lastSaved = formatSavedDate(now);
+		localStorage.setItem('savedDate', ts);
+		lastSaved = formatSavedDate(ts);
 	}
 
 	onDestroy(() => {
@@ -132,7 +192,18 @@
 	</div>
 
 	<div class="card">
-		<p class="description">Enter Maghrib and the following morning's Fajr</p>
+		{#if loading}
+			<p class="fetch-status loading">Fetching today's times...</p>
+		{:else if autoFetched}
+			<p class="fetch-status success">📍 London · {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+		{:else if fetchError}
+			<div class="warning-banner fetch-error-banner">
+				<span class="warning-icon">⚠️</span>
+				<p>{fetchError}</p>
+			</div>
+		{:else}
+			<p class="description">Enter Maghrib and the following morning's Fajr</p>
+		{/if}
 
 		<div class="inputs">
 			<TimeInput
@@ -148,7 +219,7 @@
 			</div>
 
 			<TimeInput
-				label="Fajr"
+				label="Fajr (tomorrow)"
 				bind:value={fajr}
 				warning={fajrWarning}
 			/>
@@ -171,7 +242,7 @@
 			</div>
 		{/if}
 
-		{#if lastSaved}
+		{#if lastSaved && !autoFetched}
 			<p class="last-saved">
 				<span class="save-icon">💾</span>
 				Last saved: {lastSaved}
@@ -350,6 +421,24 @@
 		font-size: 0.85rem;
 		color: rgba(255, 255, 255, 0.6);
 		line-height: 1.4;
+	}
+
+	.fetch-status {
+		text-align: center;
+		font-size: 0.85rem;
+		line-height: 1.4;
+	}
+
+	.fetch-status.loading {
+		color: rgba(255, 255, 255, 0.4);
+	}
+
+	.fetch-status.success {
+		color: rgba(120, 200, 140, 0.9);
+	}
+
+	.fetch-error-banner {
+		margin-bottom: 0;
 	}
 
 	.info-toggle {
