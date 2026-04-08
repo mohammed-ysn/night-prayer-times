@@ -14,6 +14,7 @@
 	let loading = false;
 	let fetchError = '';
 	let autoFetched = false;
+	let manualMode = false;
 
 	const MAX_AGE_DAYS = 30;
 
@@ -46,12 +47,13 @@
 			}
 
 			const tomorrow = tomorrowStr();
+			const key = '2a99f189-6e3b-4015-8fb8-ff277642561d';
 			const [todayRes, tomorrowRes] = await Promise.all([
 				fetch(
-					`https://www.londonprayertimes.com/api/times/?format=json&key=2a99f189-6e3b-4015-8fb8-ff277642561d&date=${today}&24hours=true`
+					`https://www.londonprayertimes.com/api/times/?format=json&key=${key}&date=${today}&24hours=true`
 				),
 				fetch(
-					`https://www.londonprayertimes.com/api/times/?format=json&key=2a99f189-6e3b-4015-8fb8-ff277642561d&date=${tomorrow}&24hours=true`
+					`https://www.londonprayertimes.com/api/times/?format=json&key=${key}&date=${tomorrow}&24hours=true`
 				)
 			]);
 
@@ -95,6 +97,33 @@
 		if (maghrib || fajr) lastSaved = formatSavedDate(savedDate);
 	}
 
+	function switchToManual() {
+		manualMode = true;
+		localStorage.setItem('preferManual', 'true');
+		// Load previously saved manual times, or start fresh
+		const savedMag = localStorage.getItem('maghrib');
+		const savedFaj = localStorage.getItem('fajr');
+		const savedDate = localStorage.getItem('savedDate');
+		maghrib = savedMag || '';
+		fajr = savedFaj || '';
+		if ((savedMag || savedFaj) && savedDate) {
+			lastSaved = formatSavedDate(savedDate);
+		} else {
+			lastSaved = '';
+		}
+	}
+
+	function switchToLondon() {
+		manualMode = false;
+		localStorage.removeItem('preferManual');
+		const m = localStorage.getItem('apiMaghrib');
+		const f = localStorage.getItem('apiFajr');
+		if (m && f) {
+			maghrib = m;
+			fajr = f;
+		}
+	}
+
 	function formatSavedDate(dateStr: string): string {
 		const date = new Date(dateStr);
 		return date.toLocaleDateString('en-GB', {
@@ -107,7 +136,11 @@
 	}
 
 	onMount(() => {
-		fetchPrayerTimes();
+		fetchPrayerTimes().then(() => {
+			if (localStorage.getItem('preferManual') === 'true') {
+				switchToManual();
+			}
+		});
 
 		interval = setInterval(() => {
 			now = new Date();
@@ -119,13 +152,13 @@
 	});
 
 	// Save manual edits to localStorage
-	$: if (maghrib && !autoFetched) {
+	$: if (maghrib && manualMode) {
 		const ts = new Date().toISOString();
 		localStorage.setItem('maghrib', maghrib);
 		localStorage.setItem('savedDate', ts);
 		lastSaved = formatSavedDate(ts);
 	}
-	$: if (fajr && !autoFetched) {
+	$: if (fajr && manualMode) {
 		const ts = new Date().toISOString();
 		localStorage.setItem('fajr', fajr);
 		localStorage.setItem('savedDate', ts);
@@ -140,7 +173,6 @@
 	const MAGHRIB_RANGE = { min: 13, max: 23 };
 	const FAJR_RANGE = { min: 0, max: 8 };
 
-	// Reactive validation
 	$: maghribHour = maghrib ? new Date(`2000-01-01T${maghrib}`).getHours() : null;
 	$: fajrHour = fajr ? new Date(`2000-01-01T${fajr}`).getHours() : null;
 
@@ -151,9 +183,14 @@
 	$: fajrWarning =
 		fajrHour !== null && (fajrHour < FAJR_RANGE.min || fajrHour > FAJR_RANGE.max);
 
-	// Reactive calculations
 	$: canCalculate = maghrib && fajr;
 	$: results = canCalculate ? calculateTimes(maghrib, fajr) : null;
+
+	$: londonDate = new Date().toLocaleDateString('en-GB', {
+		day: 'numeric',
+		month: 'short',
+		year: 'numeric'
+	});
 </script>
 
 <svelte:head>
@@ -193,67 +230,115 @@
 
 	<div class="card">
 		{#if loading}
-			<p class="fetch-status loading">Fetching today's times...</p>
-		{:else if autoFetched}
-			<p class="fetch-status success">📍 London · {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-		{:else if fetchError}
-			<div class="warning-banner fetch-error-banner">
-				<span class="warning-icon">⚠️</span>
-				<p>{fetchError}</p>
+			<p class="status-text loading">Fetching today's times...</p>
+
+		{:else if autoFetched && !manualMode}
+			<!-- London mode -->
+			<p class="status-text success">📍 London · {londonDate}</p>
+
+			<div class="inputs">
+				<TimeInput label="Maghrib" bind:value={maghrib} warning={maghribWarning} />
+
+				<div class="input-divider">
+					<span class="divider-dot"></span>
+					<span class="divider-line"></span>
+					<span class="divider-dot"></span>
+				</div>
+
+				<TimeInput label="Fajr (tomorrow)" bind:value={fajr} warning={fajrWarning} />
 			</div>
+
+			{#if maghribWarning || fajrWarning}
+				<div class="warnings">
+					{#if maghribWarning}
+						<div class="warning-banner">
+							<span class="warning-icon">⚠️</span>
+							<p>That doesn't look like a typical Maghrib time — it's usually in the evening</p>
+						</div>
+					{/if}
+					{#if fajrWarning}
+						<div class="warning-banner">
+							<span class="warning-icon">⚠️</span>
+							<p>That doesn't look like a typical Fajr time — it's usually early morning</p>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			{#if results}
+				<div class="results">
+					<Result label="End of Isha" time={results.endOfIsha} {now} icon="🌓" />
+					<Result label="Last third begins" time={results.lastThird} {now} icon="✨" />
+				</div>
+			{/if}
+
+			<div class="location-prompt">
+				<div class="location-divider"></div>
+				<button class="location-link" onclick={switchToManual}>
+					Not in London? Enter times manually
+					<span class="arrow">→</span>
+				</button>
+			</div>
+
 		{:else}
-			<p class="description">Enter Maghrib and the following morning's Fajr</p>
-		{/if}
+			<!-- Manual mode -->
+			{#if autoFetched}
+				<button class="back-btn" onclick={switchToLondon}>
+					<span class="back-arrow">←</span> London times
+				</button>
+			{:else if fetchError}
+				<div class="warning-banner">
+					<span class="warning-icon">⚠️</span>
+					<p>{fetchError}</p>
+				</div>
+			{/if}
 
-		<div class="inputs">
-			<TimeInput
-				label="Maghrib"
-				bind:value={maghrib}
-				warning={maghribWarning}
-			/>
-
-			<div class="input-divider">
-				<span class="divider-dot"></span>
-				<span class="divider-line"></span>
-				<span class="divider-dot"></span>
-			</div>
-
-			<TimeInput
-				label="Fajr (tomorrow)"
-				bind:value={fajr}
-				warning={fajrWarning}
-			/>
-		</div>
-
-		{#if maghribWarning || fajrWarning}
-			<div class="warnings">
-				{#if maghribWarning}
-					<div class="warning-banner">
-						<span class="warning-icon">⚠️</span>
-						<p>That doesn't look like a typical Maghrib time — it's usually in the evening</p>
-					</div>
-				{/if}
-				{#if fajrWarning}
-					<div class="warning-banner">
-						<span class="warning-icon">⚠️</span>
-						<p>That doesn't look like a typical Fajr time — it's usually early morning</p>
-					</div>
-				{/if}
-			</div>
-		{/if}
-
-		{#if lastSaved && !autoFetched}
-			<p class="last-saved">
-				<span class="save-icon">💾</span>
-				Last saved: {lastSaved}
+			<p class="description" class:has-back={autoFetched}>
+				Enter Maghrib and the following morning's Fajr
 			</p>
-		{/if}
 
-		{#if results}
-			<div class="results">
-				<Result label="End of Isha" time={results.endOfIsha} {now} icon="🌓" />
-				<Result label="Last third begins" time={results.lastThird} {now} icon="✨" />
+			<div class="inputs">
+				<TimeInput label="Maghrib" bind:value={maghrib} warning={maghribWarning} />
+
+				<div class="input-divider">
+					<span class="divider-dot"></span>
+					<span class="divider-line"></span>
+					<span class="divider-dot"></span>
+				</div>
+
+				<TimeInput label="Fajr (tomorrow)" bind:value={fajr} warning={fajrWarning} />
 			</div>
+
+			{#if maghribWarning || fajrWarning}
+				<div class="warnings">
+					{#if maghribWarning}
+						<div class="warning-banner">
+							<span class="warning-icon">⚠️</span>
+							<p>That doesn't look like a typical Maghrib time — it's usually in the evening</p>
+						</div>
+					{/if}
+					{#if fajrWarning}
+						<div class="warning-banner">
+							<span class="warning-icon">⚠️</span>
+							<p>That doesn't look like a typical Fajr time — it's usually early morning</p>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
+			{#if lastSaved}
+				<p class="last-saved">
+					<span class="save-icon">💾</span>
+					Last saved: {lastSaved}
+				</p>
+			{/if}
+
+			{#if results}
+				<div class="results">
+					<Result label="End of Isha" time={results.endOfIsha} {now} icon="🌓" />
+					<Result label="Last third begins" time={results.lastThird} {now} icon="✨" />
+				</div>
+			{/if}
 		{/if}
 	</div>
 
@@ -416,29 +501,103 @@
 			inset 0 1px 0 rgba(255, 255, 255, 0.1);
 	}
 
+	/* Status line (loading / London badge) */
+	.status-text {
+		text-align: center;
+		font-size: 0.85rem;
+		line-height: 1.4;
+	}
+
+	.status-text.loading {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
+	.status-text.success {
+		color: rgba(120, 200, 140, 0.9);
+		letter-spacing: 0.2px;
+	}
+
+	/* "Not in London?" prompt */
+	.location-prompt {
+		margin-top: 1.75rem;
+	}
+
+	.location-divider {
+		height: 1px;
+		background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+		margin-bottom: 1rem;
+	}
+
+	.location-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		width: 100%;
+		background: none;
+		border: none;
+		font-family: inherit;
+		font-size: 0.8rem;
+		color: rgba(255, 255, 255, 0.35);
+		cursor: pointer;
+		padding: 0.25rem;
+		transition: color 0.2s ease;
+	}
+
+	.location-link:hover {
+		color: rgba(255, 255, 255, 0.7);
+	}
+
+	.location-link .arrow {
+		transition: transform 0.2s ease;
+		display: inline-block;
+	}
+
+	.location-link:hover .arrow {
+		transform: translateX(3px);
+	}
+
+	/* "← London times" back button */
+	.back-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		background: rgba(255, 255, 255, 0.06);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 2rem;
+		color: rgba(255, 255, 255, 0.5);
+		font-family: inherit;
+		font-size: 0.78rem;
+		cursor: pointer;
+		padding: 0.35rem 0.9rem;
+		margin-bottom: 1.25rem;
+		transition: all 0.2s ease;
+	}
+
+	.back-btn:hover {
+		background: rgba(255, 255, 255, 0.1);
+		color: rgba(255, 255, 255, 0.85);
+		border-color: rgba(255, 255, 255, 0.2);
+	}
+
+	.back-arrow {
+		transition: transform 0.2s ease;
+		display: inline-block;
+	}
+
+	.back-btn:hover .back-arrow {
+		transform: translateX(-3px);
+	}
+
 	.description {
 		text-align: center;
 		font-size: 0.85rem;
-		color: rgba(255, 255, 255, 0.6);
+		color: rgba(255, 255, 255, 0.5);
 		line-height: 1.4;
 	}
 
-	.fetch-status {
-		text-align: center;
-		font-size: 0.85rem;
-		line-height: 1.4;
-	}
-
-	.fetch-status.loading {
-		color: rgba(255, 255, 255, 0.4);
-	}
-
-	.fetch-status.success {
-		color: rgba(120, 200, 140, 0.9);
-	}
-
-	.fetch-error-banner {
-		margin-bottom: 0;
+	.description.has-back {
+		margin-top: 0;
 	}
 
 	.info-toggle {
@@ -576,6 +735,7 @@
 		background: rgba(251, 191, 36, 0.1);
 		border: 1px solid rgba(251, 191, 36, 0.2);
 		border-radius: 0.5rem;
+		margin-bottom: 1rem;
 	}
 
 	.warning-icon {
