@@ -1,18 +1,18 @@
 # Night Prayer Times
 
-A simple calculator for Islamic night prayer times. Enter Maghrib and Fajr times to calculate the end of Isha and the last third of the night.
+A calculator for Islamic night prayer times. Automatically fetches today's Maghrib and tomorrow's Fajr for London, then calculates the end of Isha and the start of the last third of the night.
 
 ## Development
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ## Build
 
 ```bash
-npm run build
+pnpm build
 ```
 
 Outputs static files to `build/` for deployment to GitHub Pages.
