@@ -126,7 +126,8 @@
 
 			{#if results}
 				<div class="results">
-					<Result label="End of Isha" time={results.endOfIsha} {now} icon="🌓" />
+					<Result label="End of Isha · ⅓ night" time={results.endOfIshaThird} {now} icon="🌑" />
+					<Result label="End of Isha · midnight" time={results.endOfIsha} {now} icon="🌓" />
 					<Result label="Last third begins" time={results.lastThird} {now} icon="✨" />
 				</div>
 			{/if}
@@ -160,7 +161,8 @@
 
 			{#if results}
 				<div class="results">
-					<Result label="End of Isha" time={results.endOfIsha} {now} icon="🌓" />
+					<Result label="End of Isha · ⅓ night" time={results.endOfIshaThird} {now} icon="🌑" />
+					<Result label="End of Isha · midnight" time={results.endOfIsha} {now} icon="🌓" />
 					<Result label="Last third begins" time={results.lastThird} {now} icon="✨" />
 				</div>
 			{/if}

@@ -1,4 +1,5 @@
 export interface PrayerTimes {
+	endOfIshaThird: Date;
 	endOfIsha: Date;
 	lastThird: Date;
 }
@@ -28,10 +29,11 @@ export function calculateTimes(maghribStr: string, fajrStr: string): PrayerTimes
 
 	const diff = fajrTime.getTime() - maghribTime.getTime();
 
+	const endOfIshaThird = new Date(maghribTime.getTime() + diff * (1 / 3));
 	const endOfIsha = new Date(maghribTime.getTime() + diff * 0.5);
 	const lastThird = new Date(maghribTime.getTime() + diff * (2 / 3));
 
-	return { endOfIsha, lastThird };
+	return { endOfIshaThird, endOfIsha, lastThird };
 }
 
 export function formatTime(date: Date): string {

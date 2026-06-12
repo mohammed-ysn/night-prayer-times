@@ -11,7 +11,10 @@
 <div class="info-panel" class:open={showInfo}>
 	<div class="info-item">
 		<span class="info-label">End of Isha</span>
-		<p>The midpoint between Maghrib and Fajr. One opinion for when Isha prayer time ends.</p>
+		<p>
+			Two scholarly opinions: one-third of the night after Maghrib, or the midpoint between Maghrib
+			and Fajr.
+		</p>
 	</div>
 	<div class="info-item">
 		<span class="info-label">Last third</span>
