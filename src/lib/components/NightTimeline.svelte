@@ -21,7 +21,7 @@
 
 	let markers = $derived([
 		{
-			icon: '🌑',
+			icon: '🌒',
 			label: 'Isha ends · ⅓',
 			time: times.endOfIshaThird,
 			percent: percent(times.endOfIshaThird)
