@@ -11,7 +11,7 @@
 	} from '$lib/storage';
 	import InfoPanel from '$lib/components/InfoPanel.svelte';
 	import PrayerInputs from '$lib/components/PrayerInputs.svelte';
-	import Result from '$lib/components/Result.svelte';
+	import NightTimeline from '$lib/components/NightTimeline.svelte';
 
 	let maghrib = '';
 	let fajr = '';
@@ -125,11 +125,7 @@
 			<PrayerInputs bind:maghrib bind:fajr />
 
 			{#if results}
-				<div class="results">
-					<Result label="End of Isha · ⅓ night" time={results.endOfIshaThird} {now} icon="🌑" />
-					<Result label="End of Isha · midnight" time={results.endOfIsha} {now} icon="🌓" />
-					<Result label="Last third begins" time={results.lastThird} {now} icon="✨" />
-				</div>
+				<NightTimeline times={results} {now} />
 			{/if}
 
 			<div class="location-prompt">
@@ -160,11 +156,7 @@
 			{/if}
 
 			{#if results}
-				<div class="results">
-					<Result label="End of Isha · ⅓ night" time={results.endOfIshaThird} {now} icon="🌑" />
-					<Result label="End of Isha · midnight" time={results.endOfIsha} {now} icon="🌓" />
-					<Result label="Last third begins" time={results.lastThird} {now} icon="✨" />
-				</div>
+				<NightTimeline times={results} {now} />
 			{/if}
 		{/if}
 	</div>
@@ -415,13 +407,6 @@
 		font-size: 0.75rem;
 		line-height: 1.4;
 		margin: 0;
-	}
-
-	.results {
-		margin-top: 1.5rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
 	}
 
 	.last-saved {
