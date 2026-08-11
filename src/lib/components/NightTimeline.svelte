@@ -22,19 +22,22 @@
 	let markers = $derived([
 		{
 			icon: '🌒',
-			label: 'Isha ends · ⅓',
+			label: 'Isha cutoff',
+			sublabel: 'opinion: ⅓ night',
 			time: times.endOfIshaThird,
 			percent: percent(times.endOfIshaThird)
 		},
 		{
 			icon: '🌓',
-			label: 'Isha ends · ½',
+			label: 'Isha cutoff',
+			sublabel: 'opinion: ½ night',
 			time: times.endOfIsha,
 			percent: percent(times.endOfIsha)
 		},
 		{
 			icon: '✨',
 			label: 'Last third begins',
+			sublabel: '',
 			time: times.lastThird,
 			percent: percent(times.lastThird)
 		}
@@ -44,12 +47,14 @@
 <div class="timeline">
 	<div class="track">
 		<div class="track-fill" style="width: {nowPercent}%"></div>
-		{#each markers as marker (marker.label)}
+		{#each markers as marker (marker.label + marker.sublabel)}
 			<div
 				class="tick"
 				class:upcoming={now < marker.time}
 				style="left: {marker.percent}%"
-				title="{marker.label} · {formatTime(marker.time)}"
+				title="{marker.label}{marker.sublabel ? ` (${marker.sublabel})` : ''} · {formatTime(
+					marker.time
+				)}"
 			>
 				<span class="tick-dot">{marker.icon}</span>
 			</div>
@@ -63,14 +68,20 @@
 
 	<div class="track-ends">
 		<span>🕌 {formatTime(times.maghribTime)}</span>
-		<span>🌄 {formatTime(times.fajrTime)}</span>
+		<span title="In necessity, Isha stays valid till Fajr.">
+			🌄 {formatTime(times.fajrTime)}
+		</span>
 	</div>
+	<p class="necessity-note">In necessity: Isha valid till Fajr.</p>
 
 	<div class="markers">
-		{#each markers as marker (marker.label)}
+		{#each markers as marker (marker.label + marker.sublabel)}
 			<div class="marker" class:upcoming={now < marker.time}>
 				<span class="marker-icon">{marker.icon}</span>
 				<span class="marker-label">{marker.label}</span>
+				{#if marker.sublabel}
+					<span class="marker-sublabel">{marker.sublabel}</span>
+				{/if}
 				<span class="marker-time">{formatTime(marker.time)}</span>
 				<span class="marker-relative">{getRelativeTime(marker.time, now)}</span>
 			</div>
@@ -163,6 +174,13 @@
 		color: rgba(255, 255, 255, 0.35);
 	}
 
+	.necessity-note {
+		margin: 0.35rem 0 0;
+		font-size: 0.65rem;
+		color: rgba(255, 255, 255, 0.3);
+		text-align: right;
+	}
+
 	.markers {
 		display: flex;
 		gap: 0.5rem;
@@ -198,6 +216,12 @@
 		font-size: 0.68rem;
 		color: rgba(255, 255, 255, 0.55);
 		line-height: 1.3;
+	}
+
+	.marker-sublabel {
+		font-size: 0.62rem;
+		color: rgba(255, 255, 255, 0.4);
+		margin-top: -0.1rem;
 	}
 
 	.marker-time {

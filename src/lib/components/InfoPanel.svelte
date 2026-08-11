@@ -10,10 +10,10 @@
 
 <div class="info-panel" class:open={showInfo}>
 	<div class="info-item">
-		<span class="info-label">End of Isha</span>
+		<span class="info-label">Isha cutoff</span>
 		<p>
-			Two scholarly opinions: one-third of the night after Maghrib, or the midpoint between Maghrib
-			and Fajr.
+			Two valid opinions on when Isha's time ends: ⅓ of the night after Maghrib, or ½ of the night
+			(the midpoint between Maghrib and Fajr). In necessity, Isha stays valid till Fajr.
 		</p>
 	</div>
 	<div class="info-item">
