@@ -1,4 +1,5 @@
 import { TriangleAlert } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Times } from '@/hooks/use-prayer-source';
@@ -65,12 +66,12 @@ export function ManualForm({
 
 function Notice({ children }: { children: React.ReactNode }) {
 	return (
-		<p
+		<Alert
 			role="status"
-			className="flex items-start gap-2 rounded-lg border border-warn/25 bg-warn/10 px-3 py-2 text-xs text-warn transition-[opacity,translate] duration-200 ease-[var(--ease-out)] starting:-translate-y-1 starting:opacity-0"
+			className="items-center border-warn/25 bg-warn/10 px-3 py-2 text-xs text-warn transition-[opacity,translate] duration-200 ease-[var(--ease-out)] starting:-translate-y-1 starting:opacity-0"
 		>
-			<TriangleAlert className="mt-px size-3.5 shrink-0" />
-			{children}
-		</p>
+			<TriangleAlert />
+			<AlertDescription className="text-xs text-warn">{children}</AlertDescription>
+		</Alert>
 	);
 }

@@ -1,10 +1,11 @@
+import { Card } from '@/components/ui/card';
 import type { Night } from '@/lib/night';
 import { formatTime } from '@/lib/time';
 import { cn } from '@/lib/utils';
 
 export function Schedule({ night, now }: { night: Night; now: Date }) {
 	return (
-		<div className="overflow-hidden rounded-3xl border border-border bg-card p-2 backdrop-blur-xl">
+		<Card className="gap-0 overflow-hidden rounded-3xl p-2 shadow-none backdrop-blur-xl">
 			{night.marks.map((m) => (
 				<div
 					key={m.key}
@@ -31,6 +32,6 @@ export function Schedule({ night, now }: { night: Night; now: Date }) {
 					<span className="font-mono text-sm tabular-nums">{formatTime(m.time)}</span>
 				</div>
 			))}
-		</div>
+		</Card>
 	);
 }
