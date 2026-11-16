@@ -1,7 +1,7 @@
 import { TriangleAlert } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { TimeField } from '@/components/time-field';
 import type { Times } from '@/hooks/use-prayer-source';
 
 const hourOf = (v: string) => (v ? Number(v.split(':')[0]) : null);
@@ -38,24 +38,22 @@ export function ManualForm({
 			<div className="grid grid-cols-2 gap-3">
 				<div className="flex flex-col gap-2">
 					<Label htmlFor="maghrib">Maghrib</Label>
-					<Input
+					<TimeField
 						id="maghrib"
-						type="time"
 						value={value.maghrib}
-						aria-invalid={maghribOff}
-						onChange={(e) => onChange('maghrib', e.target.value)}
-						className="tabular-nums"
+						onChange={(v) => onChange('maghrib', v)}
+						defaultValue="18:00"
+						invalid={maghribOff}
 					/>
 				</div>
 				<div className="flex flex-col gap-2">
 					<Label htmlFor="fajr">Fajr (tomorrow)</Label>
-					<Input
+					<TimeField
 						id="fajr"
-						type="time"
 						value={value.fajr}
-						aria-invalid={fajrOff}
-						onChange={(e) => onChange('fajr', e.target.value)}
-						className="tabular-nums"
+						onChange={(v) => onChange('fajr', v)}
+						defaultValue="05:00"
+						invalid={fajrOff}
 					/>
 				</div>
 			</div>
