@@ -6,6 +6,8 @@ export interface Mark {
 	key: string;
 	label: string;
 	time: Date;
+	/** Position along the night, 0 (Maghrib) to 1 (Fajr). */
+	pos: number;
 	/** The mark the countdown is running to. */
 	next?: boolean;
 }
@@ -33,12 +35,13 @@ export function getNight(times: PrayerTimes, now: Date) {
 
 	const caption = step ? `at ${formatTime(target)}` : `around ${formatTime(target)}`;
 
+	const at = (time: Date) => (time.getTime() - start) / span;
 	const base: Mark[] = [
-		{ key: 'maghrib', label: 'Maghrib', time: times.maghribTime },
-		{ key: 'third', label: 'Isha ends by ⅓', time: times.endOfIshaThird },
-		{ key: 'half', label: 'Isha ends by ½', time: times.endOfIsha },
-		{ key: 'last', label: 'Last third', time: times.lastThird },
-		{ key: 'fajr', label: 'Fajr', time: times.fajrTime }
+		{ key: 'maghrib', label: 'Maghrib', time: times.maghribTime, pos: 0 },
+		{ key: 'third', label: 'Isha ⅓', time: times.endOfIshaThird, pos: at(times.endOfIshaThird) },
+		{ key: 'half', label: 'Isha ½', time: times.endOfIsha, pos: at(times.endOfIsha) },
+		{ key: 'last', label: 'Last ⅓', time: times.lastThird, pos: at(times.lastThird) },
+		{ key: 'fajr', label: 'Fajr', time: times.fajrTime, pos: 1 }
 	];
 	const nextKey = base.find((m) => now < m.time)?.key;
 	const marks = base.map((m) => ({ ...m, next: m.key === nextKey }));

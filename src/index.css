@@ -1,0 +1,215 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+	--radius: 0.875rem;
+	--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+	/* Night-only palette: deep indigo ink and one warm gold accent. */
+	--background: #0a0a1c;
+	--foreground: #eceeff;
+	--card: oklch(1 0 0 / 5%);
+	--card-foreground: var(--foreground);
+	--popover: #15152e;
+	--popover-foreground: var(--foreground);
+	--primary: #f2c879;
+	--primary-foreground: #2a2008;
+	--secondary: oklch(1 0 0 / 8%);
+	--secondary-foreground: var(--foreground);
+	--muted: oklch(1 0 0 / 7%);
+	--muted-foreground: oklch(0.78 0.03 280);
+	--accent: oklch(1 0 0 / 12%);
+	--accent-foreground: var(--foreground);
+	--destructive: oklch(0.7 0.19 25);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 16%);
+	--ring: oklch(0.86 0.12 85 / 60%);
+	--gold: #f2c879;
+	color-scheme: dark;
+}
+
+@theme inline {
+	--font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-gold: var(--gold);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	html {
+		background: #03040c;
+	}
+	body {
+		@apply text-foreground antialiased;
+		-webkit-tap-highlight-color: transparent;
+	}
+}
+
+/* ── Sky: colours that follow the phase of the night ───────────────────── */
+@property --sa {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #0a0a1c;
+}
+@property --sb {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #0a0a1c;
+}
+@property --sc {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #0a0a1c;
+}
+@property --glow {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #fff;
+}
+@property --go {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 0;
+}
+@property --stars {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 1;
+}
+@property --lights {
+	syntax: '<number>';
+	inherits: true;
+	initial-value: 0;
+}
+
+.sky {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+	transition-property: --sa, --sb, --sc, --glow, --go, --stars, --lights;
+	transition-duration: 1.1s;
+	transition-timing-function: ease-out;
+}
+.sky[data-phase='before'] {
+	--sa: #1b1a46;
+	--sb: #5a3366;
+	--sc: #e0734a;
+	--glow: #ffb26b;
+	--go: 0.9;
+	--stars: 0.15;
+	--lights: 0.15;
+}
+.sky[data-phase='isha-third'] {
+	--sa: #0e0f3a;
+	--sb: #2a2468;
+	--sc: #8a4a78;
+	--glow: #d9739a;
+	--go: 0.5;
+	--stars: 0.65;
+	--lights: 0.9;
+}
+.sky[data-phase='isha-half'] {
+	--sa: #0a0b2e;
+	--sb: #17195a;
+	--sc: #3a3a86;
+	--glow: #6f7bff;
+	--go: 0.18;
+	--stars: 1;
+	--lights: 1;
+}
+.sky[data-phase='between'] {
+	--sa: #05061a;
+	--sb: #0b0e3a;
+	--sc: #1c2466;
+	--glow: #4a63d9;
+	--go: 0.1;
+	--stars: 1;
+	--lights: 0.7;
+}
+.sky[data-phase='last'] {
+	--sa: #04050f;
+	--sb: #08143a;
+	--sc: #1a4a78;
+	--glow: #f2c879;
+	--go: 0.4;
+	--stars: 0.9;
+	--lights: 0.5;
+}
+.sky[data-phase='after'] {
+	--sa: #0d1a3c;
+	--sb: #35568c;
+	--sc: #e0a090;
+	--glow: #ffc3a0;
+	--go: 0.85;
+	--stars: 0.1;
+	--lights: 0.15;
+}
+
+.sky-bg {
+	position: absolute;
+	inset: 0;
+	z-index: -3;
+	background: linear-gradient(180deg, var(--sa) 0%, var(--sb) 58%, var(--sc) 100%);
+}
+
+/* Film grain: hides gradient banding and gives the dark sky some texture. */
+.sky::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 6;
+	pointer-events: none;
+	opacity: 0.1;
+	mix-blend-mode: overlay;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.stars {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	opacity: var(--stars);
+}
+.twinkle {
+	animation: twinkle var(--dur) ease-in-out var(--d) infinite alternate;
+}
+@keyframes twinkle {
+	to {
+		opacity: 0.1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sky {
+		transition-duration: 0ms;
+	}
+	.twinkle {
+		animation: none;
+	}
+}
