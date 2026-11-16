@@ -1,11 +1,10 @@
 import path from 'node:path';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
 	base: process.env.NODE_ENV === 'production' ? '/night-prayer-times/' : '/',
 	server: { open: true },
-	plugins: [react(), tailwindcss()],
+	plugins: [react()],
 	resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } }
 });

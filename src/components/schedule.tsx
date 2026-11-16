@@ -1,37 +1,14 @@
-import { Card } from '@/components/ui/card';
 import type { Night } from '@/lib/night';
 import { formatTime } from '@/lib/time';
-import { cn } from '@/lib/utils';
 
-export function Schedule({ night, now }: { night: Night; now: Date }) {
+export function Schedule({ night }: { night: Night }) {
 	return (
-		<Card className="gap-0 overflow-hidden rounded-3xl p-2 shadow-none backdrop-blur-xl">
+		<ul aria-label="Schedule">
 			{night.marks.map((m) => (
-				<div
-					key={m.key}
-					className={cn(
-						'flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-[opacity,background-color] duration-200 ease-[var(--ease-out)]',
-						m.next && 'bg-primary/10',
-						now >= m.time && 'opacity-60'
-					)}
-				>
-					<span
-						className={cn(
-							'size-2 rounded-full transition-colors duration-200',
-							m.next ? 'bg-primary' : 'bg-white/40'
-						)}
-					/>
-					<span
-						className={cn(
-							'flex-1 text-sm transition-colors duration-200',
-							m.next && 'text-primary'
-						)}
-					>
-						{m.label}
-					</span>
-					<span className="font-mono text-sm tabular-nums">{formatTime(m.time)}</span>
-				</div>
+				<li key={m.key} aria-current={m.next ? 'true' : undefined}>
+					{m.label}: {formatTime(m.time)}
+				</li>
 			))}
-		</Card>
+		</ul>
 	);
 }

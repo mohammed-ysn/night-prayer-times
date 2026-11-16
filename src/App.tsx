@@ -1,13 +1,9 @@
 import { About } from '@/components/about';
-import { AuroraDial } from '@/components/aurora-dial';
+import { Countdown } from '@/components/countdown';
 import { ManualForm } from '@/components/manual-form';
 import { Schedule } from '@/components/schedule';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNow } from '@/hooks/use-now';
-import { usePrayerSource, type Source } from '@/hooks/use-prayer-source';
+import { usePrayerSource } from '@/hooks/use-prayer-source';
 import { getNight } from '@/lib/night';
 import { calculateTimes } from '@/lib/time';
 
@@ -17,10 +13,6 @@ const dateFormat = new Intl.DateTimeFormat('en-GB', {
 	month: 'short'
 });
 
-// The sliding pill behind the tabs draws the active state, so the trigger itself stays clear.
-const TAB =
-	'rounded-full data-[state=active]:border-transparent data-[state=active]:bg-transparent dark:data-[state=active]:border-transparent dark:data-[state=active]:bg-transparent';
-
 export function App() {
 	const now = useNow();
 	const p = usePrayerSource();
@@ -29,99 +21,62 @@ export function App() {
 	const loading = p.source === 'london' && p.fetchState === 'loading';
 
 	return (
-		<main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]">
-			<header className="rise flex items-center justify-between" style={{ '--i': 0 } as never}>
-				<h1 className="text-sm font-medium tracking-tight">Tonight</h1>
-				<Badge
-					variant="outline"
-					className="bg-secondary px-3 py-1 text-muted-foreground backdrop-blur"
-				>
-					{dateFormat.format(now)}
-				</Badge>
+		<main>
+			<header>
+				<h1>Tonight</h1>
+				<p>{dateFormat.format(now)}</p>
 			</header>
 
-			<Tabs
-				value={p.source}
-				onValueChange={(v) => p.chooseSource(v as Source)}
-				className="rise mt-5"
-				style={{ '--i': 1 } as never}
-			>
-				<TabsList className="relative grid h-11! w-full grid-cols-2 rounded-full">
-					<span
-						aria-hidden
-						className="absolute inset-y-[3px] left-[3px] w-[calc(50%-3px)] rounded-full border border-input bg-input/30 transition-transform duration-200 ease-[var(--ease-out)]"
-						style={{ transform: p.source === 'manual' ? 'translateX(100%)' : 'none' }}
-					/>
-					<TabsTrigger value="london" className={TAB}>
-						London
-					</TabsTrigger>
-					<TabsTrigger value="manual" className={TAB}>
-						Manual
-					</TabsTrigger>
-				</TabsList>
-			</Tabs>
+			<div role="group" aria-label="Times source">
+				<button
+					type="button"
+					aria-pressed={p.source === 'london'}
+					onClick={() => p.chooseSource('london')}
+				>
+					London
+				</button>
+				<button
+					type="button"
+					aria-pressed={p.source === 'manual'}
+					onClick={() => p.chooseSource('manual')}
+				>
+					Manual
+				</button>
+			</div>
 
-			{loading && (
-				<div aria-busy aria-label="Fetching today's times">
-					<div className="relative mx-auto mt-6 aspect-[6/5] w-full max-w-[340px]">
-						<Skeleton className="absolute left-[8%] top-[9.6%] aspect-square w-[84%] rounded-full border-[16px] border-accent bg-transparent" />
-					</div>
-					<Skeleton className="mt-4 h-[216px] rounded-3xl" />
-				</div>
-			)}
+			{loading && <p>Fetching today's times…</p>}
 
 			{night && (
 				<>
-					<div className="rise mt-6" style={{ '--i': 2 } as never}>
-						<AuroraDial night={night} now={now} />
-					</div>
-					<div className="rise mt-4" style={{ '--i': 3 } as never}>
-						<Schedule night={night} now={now} />
-					</div>
+					<Countdown night={night} now={now} />
+					<Schedule night={night} />
 				</>
 			)}
 
 			{p.source === 'manual' && (
-				<div className="rise mt-4" style={{ '--i': 4 } as never}>
-					<ManualForm
-						value={p.manual}
-						onChange={p.setManualTime}
-						lastSaved={p.lastSaved}
-						error={
-							p.fetchState === 'error'
-								? 'Could not fetch London times. Enter them manually.'
-								: undefined
-						}
-					/>
-				</div>
+				<ManualForm
+					value={p.manual}
+					onChange={p.setManualTime}
+					lastSaved={p.lastSaved}
+					error={
+						p.fetchState === 'error'
+							? 'Could not fetch London times. Enter them manually.'
+							: undefined
+					}
+				/>
 			)}
 
-			<div className="rise mt-4" style={{ '--i': 5 } as never}>
-				<About />
-			</div>
+			<About />
 
-			<footer className="mt-auto flex items-center justify-center gap-4 pt-4 text-xs text-muted-foreground">
-				<Button
-					asChild
-					variant="link"
-					className="h-11 px-1 text-xs text-muted-foreground hover:text-foreground"
+			<footer>
+				<a
+					href="https://github.com/mohammed-ysn/night-prayer-times/issues"
+					target="_blank"
+					rel="noopener noreferrer"
 				>
-					<a
-						href="https://github.com/mohammed-ysn/night-prayer-times/issues"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Report a bug
-					</a>
-				</Button>
-				<span aria-hidden>·</span>
-				<Button
-					asChild
-					variant="link"
-					className="h-11 px-1 text-xs text-muted-foreground hover:text-foreground"
-				>
-					<a href="mailto:mohammedysn15@gmail.com">Email</a>
-				</Button>
+					Report a bug
+				</a>{' '}
+				<a href="mailto:mohammedysn15@gmail.com">Email</a>
 			</footer>
 		</main>
 	);
