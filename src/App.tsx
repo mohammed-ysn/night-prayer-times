@@ -60,8 +60,8 @@ export function App() {
 
 			{loading && (
 				<div aria-busy aria-label="Fetching today's times" className="animate-pulse">
-					<div className="mx-auto mt-6 aspect-square w-full max-w-[340px] p-[22px]">
-						<div className="size-full rounded-full border-[16px] border-white/5" />
+					<div className="relative mx-auto mt-6 aspect-[6/5] w-full max-w-[340px]">
+						<div className="absolute left-[8%] top-[9.6%] aspect-square w-[84%] rounded-full border-[16px] border-white/5" />
 					</div>
 					<div className="mt-4 h-[216px] rounded-3xl border border-border bg-card" />
 				</div>

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { makeArc } from '@/lib/arc';
 import type { Night } from '@/lib/night';
 import { formatCountdown } from '@/lib/time';
@@ -21,18 +22,33 @@ const TICKS: [string, number, string][] = [
 
 export function AuroraDial({ night, now }: { night: Night; now: Date }) {
 	const { f, phase, inNight, target, eyebrow, caption, marks } = night;
-	const filled = phase === 'before' ? 0 : f;
-	const marker = point(f);
+
+	// Draw the arc on once at first load, then settle into the 1s linear tick.
+	const [ready, setReady] = useState(false);
+	const [settled, setSettled] = useState(false);
+	useEffect(() => {
+		const raf = requestAnimationFrame(() => setReady(true));
+		const timer = setTimeout(() => setSettled(true), 900);
+		return () => {
+			cancelAnimationFrame(raf);
+			clearTimeout(timer);
+		};
+	}, []);
+	const ease = settled ? '1s linear' : '800ms var(--ease-out)';
+	const shown = ready ? f : 0;
+
+	const filled = phase === 'before' ? 0 : shown;
+	const marker = point(shown);
 	const fill = {
 		pathLength: 100,
 		strokeDasharray: `${filled * 100} 200`,
-		style: { transition: 'stroke-dasharray 1s linear' }
+		style: { transition: `stroke-dasharray ${ease}` }
 	};
 
 	return (
-		<section className="relative mx-auto aspect-square w-full max-w-[340px]">
+		<section className="relative mx-auto aspect-[6/5] w-full max-w-[340px]">
 			<svg
-				viewBox="0 0 300 300"
+				viewBox="0 0 300 250"
 				className="size-full overflow-visible"
 				role="img"
 				aria-label={`Night is ${Math.round(f * 100)}% over`}
@@ -50,10 +66,10 @@ export function AuroraDial({ night, now }: { night: Night; now: Date }) {
 				</defs>
 				<path {...track} opacity={0.16} />
 				{filled > 0 && (
-					<>
+					<g style={{ opacity: ready ? 1 : 0 }}>
 						<path {...track} {...fill} filter="url(#aurora-glow)" opacity={0.55} />
 						<path {...track} {...fill} />
-					</>
+					</g>
 				)}
 				{TICKS.map(([key, k, label]) => {
 					const mark = marks.find((m) => m.key === key);
@@ -92,7 +108,7 @@ export function AuroraDial({ night, now }: { night: Night; now: Date }) {
 						className="starting:opacity-0"
 						style={{
 							transform: `translate(${marker.x}px, ${marker.y}px)`,
-							transition: 'transform 1s linear, opacity 200ms var(--ease-out)'
+							transition: `transform ${ease}, opacity 200ms var(--ease-out)`
 						}}
 					>
 						<circle r={18} fill="#fff" opacity={0.18} filter="url(#aurora-glow)" />
@@ -101,7 +117,7 @@ export function AuroraDial({ night, now }: { night: Night; now: Date }) {
 				)}
 			</svg>
 
-			<div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+			<div className="absolute inset-x-0 top-[60%] flex -translate-y-1/2 flex-col items-center text-center">
 				<p className="text-sm text-muted-foreground">{eyebrow}</p>
 				<p
 					className="mt-1 bg-gradient-to-b from-white to-[#c9bcff] bg-clip-text font-mono text-5xl font-extralight tabular-nums tracking-tight text-transparent"

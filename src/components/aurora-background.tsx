@@ -1,10 +1,21 @@
-/** Soft colour glows behind the page. Static, so no per-frame cost. */
+const glow = (colour: string) => `radial-gradient(closest-side, var(${colour}), transparent)`;
+
+/** Soft colour glows behind the page. Gradients, not blur filters, so scrolling stays cheap. */
 export function AuroraBackground() {
 	return (
 		<div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-			<div className="absolute -left-24 -top-20 size-[380px] rounded-full bg-aurora-1/30 blur-[100px]" />
-			<div className="absolute -bottom-28 -right-24 size-[360px] rounded-full bg-aurora-3/15 blur-[100px]" />
-			<div className="absolute right-0 top-1/3 size-[240px] rounded-full bg-aurora-4/10 blur-[90px]" />
+			<div
+				className="absolute -left-[186px] -top-[170px] size-[560px] opacity-30"
+				style={{ background: glow('--aurora-1') }}
+			/>
+			<div
+				className="absolute -bottom-[192px] -right-[176px] size-[520px] opacity-15"
+				style={{ background: glow('--aurora-3') }}
+			/>
+			<div
+				className="absolute -right-[80px] top-[calc(33.333%-80px)] size-[400px] opacity-10"
+				style={{ background: glow('--aurora-4') }}
+			/>
 		</div>
 	);
 }
