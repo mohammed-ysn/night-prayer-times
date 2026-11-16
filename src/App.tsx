@@ -1,5 +1,4 @@
 import { About } from '@/components/about';
-import { AuroraBackground } from '@/components/aurora-background';
 import { AuroraDial } from '@/components/aurora-dial';
 import { ManualForm } from '@/components/manual-form';
 import { Schedule } from '@/components/schedule';
@@ -28,8 +27,6 @@ export function App() {
 
 	return (
 		<main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]">
-			<AuroraBackground />
-
 			<header className="rise flex items-center justify-between" style={{ '--i': 0 } as never}>
 				<h1 className="text-sm font-medium tracking-tight">Tonight</h1>
 				<span className="rounded-full border border-border bg-secondary px-3 py-1 text-xs text-muted-foreground backdrop-blur">
