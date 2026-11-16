@@ -1,46 +1,45 @@
 import { formatTime, type PrayerTimes } from '@/lib/time';
 
-export type Phase = 'before' | 'early' | 'last' | 'after';
+export type Phase = 'before' | 'isha-third' | 'isha-half' | 'between' | 'last' | 'after';
 
 export interface Mark {
 	key: string;
 	label: string;
 	time: Date;
-	gold?: boolean;
+	/** The mark the countdown is running to. */
+	next?: boolean;
 }
 
 /** Everything the UI needs to know about where we are in the night. */
 export function getNight(times: PrayerTimes, now: Date) {
 	const start = times.maghribTime.getTime();
 	const span = times.fajrTime.getTime() - start;
-	const phase: Phase =
-		now < times.maghribTime
-			? 'before'
-			: now < times.lastThird
-				? 'early'
-				: now < times.fajrTime
-					? 'last'
-					: 'after';
 	const f = Math.min(1, Math.max(0, (now.getTime() - start) / span));
 
-	const [eyebrow, target]: [string, Date | null] =
-		phase === 'before'
-			? ['Night begins in', times.maghribTime]
-			: phase === 'early'
-				? ['Last third begins in', times.lastThird]
-				: phase === 'last'
-					? ['Fajr in', times.fajrTime]
-					: ['Night has ended', null];
+	// Each phase counts down to the next mark.
+	const steps: [Phase, Date, string][] = [
+		['before', times.maghribTime, 'Maghrib in'],
+		['isha-third', times.endOfIshaThird, 'Isha ends (⅓) in'],
+		['isha-half', times.endOfIsha, 'Isha ends (½) in'],
+		['between', times.lastThird, 'Last third begins in'],
+		['last', times.fajrTime, 'Fajr in']
+	];
+	const step = steps.find(([, end]) => now < end);
+	const phase: Phase = step ? step[0] : 'after';
+	const target = step ? step[1] : null;
+	const eyebrow = step ? step[2] : 'Night has ended';
 
 	const caption = target ? `at ${formatTime(target)}` : `Fajr was ${formatTime(times.fajrTime)}`;
 
-	const marks: Mark[] = [
+	const base: Mark[] = [
 		{ key: 'maghrib', label: 'Maghrib', time: times.maghribTime },
 		{ key: 'third', label: 'Isha ends by ⅓', time: times.endOfIshaThird },
 		{ key: 'half', label: 'Isha ends by ½', time: times.endOfIsha },
-		{ key: 'last', label: 'Last third', time: times.lastThird, gold: true },
+		{ key: 'last', label: 'Last third', time: times.lastThird },
 		{ key: 'fajr', label: 'Fajr', time: times.fajrTime }
 	];
+	const nextKey = base.find((m) => now < m.time)?.key;
+	const marks = base.map((m) => ({ ...m, next: m.key === nextKey }));
 
 	return {
 		phase,
@@ -49,7 +48,7 @@ export function getNight(times: PrayerTimes, now: Date) {
 		target,
 		caption,
 		marks,
-		inNight: phase === 'early' || phase === 'last'
+		inNight: phase !== 'before' && phase !== 'after'
 	};
 }
 
