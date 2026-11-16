@@ -1,5 +1,4 @@
 .sk {
-	min-height: 100dvh;
 	--lamp: #ffd28a;
 	--far: color-mix(in oklab, var(--sc) 50%, #070820);
 	--mid: color-mix(in oklab, var(--sc) 22%, #05061a);
@@ -29,6 +28,7 @@
 	opacity: var(--lights);
 }
 .sk-scene {
+	overflow: visible;
 	position: absolute;
 	left: -25%;
 	bottom: 0;
@@ -165,8 +165,15 @@
 	}
 }
 
+/* The scene, text and lamps live in a phone-width column; the sky behind runs full-bleed. */
+.sk-col {
+	position: relative;
+	max-width: 30rem;
+	min-height: 100dvh;
+	margin: 0 auto;
+}
 /* No times yet: a shorter sky so the form below stays in view. */
-.sk[data-idle] {
+.sk[data-idle] .sk-col {
 	min-height: 560px;
 }
 .sk[data-idle] .sk-moon {

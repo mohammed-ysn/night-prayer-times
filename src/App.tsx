@@ -33,7 +33,7 @@ export function App() {
 			: undefined;
 
 	return (
-		<main className="mx-auto max-w-120">
+		<main>
 			<Skyline
 				night={night}
 				now={now}
@@ -60,37 +60,39 @@ export function App() {
 				}
 			/>
 
-			<div className="flex flex-col gap-7 bg-[#03040c] px-6 pt-7 pb-[calc(env(safe-area-inset-bottom)+40px)] text-sm leading-normal">
-				{p.source === 'manual' && (
-					<ManualForm
-						value={p.manual}
-						onChange={p.setManualTime}
-						lastSaved={p.lastSaved}
-						error={
-							p.fetchState === 'error'
-								? 'Could not fetch London times. Enter them manually.'
-								: undefined
-						}
-					/>
-				)}
+			<div className="bg-[#03040c]">
+				<div className="mx-auto flex max-w-120 flex-col gap-7 px-6 pt-7 pb-[calc(env(safe-area-inset-bottom)+40px)] text-sm leading-normal">
+					{p.source === 'manual' && (
+						<ManualForm
+							value={p.manual}
+							onChange={p.setManualTime}
+							lastSaved={p.lastSaved}
+							error={
+								p.fetchState === 'error'
+									? 'Could not fetch London times. Enter them manually.'
+									: undefined
+							}
+						/>
+					)}
 
-				<About />
+					<About />
 
-				<footer className="flex gap-1 text-muted-foreground">
-					<Button variant="link" size="sm" className="h-auto px-0 text-muted-foreground" asChild>
-						<a
-							href="https://github.com/mohammed-ysn/night-prayer-times/issues"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Report a bug
-						</a>
-					</Button>
-					<span aria-hidden="true">·</span>
-					<Button variant="link" size="sm" className="h-auto px-0 text-muted-foreground" asChild>
-						<a href="mailto:mohammedysn15@gmail.com">Email</a>
-					</Button>
-				</footer>
+					<footer className="flex gap-1 text-muted-foreground">
+						<Button variant="link" size="sm" className="h-auto px-0 text-muted-foreground" asChild>
+							<a
+								href="https://github.com/mohammed-ysn/night-prayer-times/issues"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								Report a bug
+							</a>
+						</Button>
+						<span aria-hidden="true">·</span>
+						<Button variant="link" size="sm" className="h-auto px-0 text-muted-foreground" asChild>
+							<a href="mailto:mohammedysn15@gmail.com">Email</a>
+						</Button>
+					</footer>
+				</div>
 			</div>
 		</main>
 	);

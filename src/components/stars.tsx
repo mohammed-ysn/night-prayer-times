@@ -13,8 +13,8 @@ function makeStars(count: number, seed: number) {
 	return Array.from({ length: count }, () => {
 		const big = next() > 0.88;
 		return {
-			x: next() * 400,
-			y: next() * 800,
+			x: next() * 1600,
+			y: next() * 1000,
 			r: big ? 1.1 + next() * 0.6 : 0.35 + next() * 0.7,
 			o: 0.3 + next() * 0.7,
 			twinkle: next() > 0.55,
@@ -25,12 +25,12 @@ function makeStars(count: number, seed: number) {
 }
 
 /** Fixed starfield (seeded, so it never reshuffles). Its overall opacity follows `--stars`. */
-export function Stars({ count = 80, seed = 5 }: { count?: number; seed?: number }) {
+export function Stars({ count = 260, seed = 5 }: { count?: number; seed?: number }) {
 	const stars = useMemo(() => makeStars(count, seed), [count, seed]);
 	return (
 		<svg
 			className="stars"
-			viewBox="0 0 400 800"
+			viewBox="0 0 1600 1000"
 			preserveAspectRatio="xMidYMid slice"
 			aria-hidden="true"
 		>

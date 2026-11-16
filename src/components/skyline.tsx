@@ -14,6 +14,8 @@ const VB_H = 360;
 const BASE = 200;
 // Drawn 1.5× wider than the screen and cropped, so the mosque stays large on a phone.
 const SCENE = 1.5;
+// The land and water run on far beyond the drawing so a wide window never sees an edge.
+const EXT = 2400;
 
 const windows: [number, number][] = [
 	[31, 191],
@@ -34,6 +36,10 @@ const windows: [number, number][] = [
 function City() {
 	return (
 		<>
+			<rect className="sk-far" x={-EXT} y="150" width={EXT} height="60" />
+			<rect className="sk-far" x={VB_W} y="124" width={EXT} height="86" />
+			<rect className="sk-mid" x={-EXT} y="172" width={EXT} height="38" />
+			<rect className="sk-mid" x={VB_W} y="160" width={EXT} height="50" />
 			<path
 				className="sk-far"
 				d="M0 150 C30 132 60 142 100 128 S170 118 215 132 S300 124 340 120 S390 126 400 124 V210 H0Z"
@@ -43,6 +49,8 @@ function City() {
 				d="M0 172 C50 158 90 170 140 160 S230 150 280 162 S360 156 400 160 V210 H0Z"
 			/>
 			<g className="sk-near">
+				<rect x={-EXT} y="190" width={EXT} height="10" />
+				<rect x={VB_W} y="190" width={EXT} height="10" />
 				{/* main hall + dome */}
 				<rect x="160" y="172" width="80" height="28" />
 				<path d="M170 172 V166 A30 30 0 0 1 230 166 V172Z" />
@@ -116,124 +124,154 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 	const reflection = moonOn ? 0.22 + 0.55 * lift : 0;
 
 	return (
-		<div ref={ref} className="sky sk" data-phase={phase} data-idle={night ? undefined : ''}>
+		<div className="sky sk" data-phase={phase} data-idle={night ? undefined : ''}>
 			<div className="sky-bg" />
 			<div className="sk-glow" style={{ top: yHor - 230, height: 300 }} aria-hidden="true" />
 			<Stars />
 
-			<div
-				className="sk-moon"
-				aria-hidden="true"
-				style={{
-					transform: `translate3d(${cx - 34}px, ${cy - 34}px, 0)`,
-					opacity: moonOn ? 1 : 0
-				}}
-			>
-				<div className="sk-moon-halo" />
-				<Moon phase={moonPhase(now)} size={68} />
-			</div>
+			<div ref={ref} className="sk-col">
+				<div
+					className="sk-moon"
+					aria-hidden="true"
+					style={{
+						transform: `translate3d(${cx - 34}px, ${cy - 34}px, 0)`,
+						opacity: moonOn ? 1 : 0
+					}}
+				>
+					<div className="sk-moon-halo" />
+					<Moon phase={moonPhase(now)} size={68} />
+				</div>
 
-			<svg
-				className="sk-scene"
-				viewBox={`0 0 ${VB_W} ${VB_H}`}
-				preserveAspectRatio="xMidYMax slice"
-				aria-hidden="true"
-			>
-				<defs>
-					<linearGradient id="sk-water" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="0" stopColor="var(--water-a)" />
-						<stop offset="1" stopColor="#03040c" />
-					</linearGradient>
-					<linearGradient id="sk-fade" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="0" stopColor="#fff" stopOpacity="0.9" />
-						<stop offset="0.5" stopColor="#fff" stopOpacity="0.25" />
-						<stop offset="1" stopColor="#fff" stopOpacity="0" />
-					</linearGradient>
-					<mask
-						id="sk-reflect-mask"
-						maskUnits="userSpaceOnUse"
-						x="0"
-						y={BASE}
-						width={VB_W}
-						height={VB_H - BASE}
-					>
-						<rect x="0" y={BASE} width={VB_W} height={VB_H - BASE} fill="url(#sk-fade)" />
-					</mask>
-					<linearGradient id="sk-moonpath" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="0" stopColor="#dfe5ff" stopOpacity="0.9" />
-						<stop offset="1" stopColor="#dfe5ff" stopOpacity="0" />
-					</linearGradient>
-					<pattern id="sk-ripple" width="6" height="3.4" patternUnits="userSpaceOnUse">
-						<rect width="6" height="1.1" fill="#fff" />
-					</pattern>
-					<mask
-						id="sk-ripple-mask"
-						maskUnits="userSpaceOnUse"
-						x="0"
-						y={BASE}
-						width={VB_W}
-						height={VB_H - BASE}
-					>
-						<rect x="0" y={BASE} width={VB_W} height={VB_H - BASE} fill="url(#sk-ripple)" />
-					</mask>
-					<g id="sk-city">
-						<City />
-					</g>
-				</defs>
-
-				<use href="#sk-city" />
-				<rect x="0" y={BASE} width={VB_W} height={VB_H - BASE} fill="url(#sk-water)" />
-				<g mask="url(#sk-reflect-mask)">
-					<use href="#sk-city" transform={`translate(0 ${BASE * 2}) scale(1 -1)`} opacity="0.32" />
-				</g>
-				<g mask="url(#sk-ripple-mask)">
-					<rect
-						x={(cx + w * ((SCENE - 1) / 2)) / scale - 9}
-						y={BASE + 2}
-						width="18"
-						height="150"
-						fill="url(#sk-moonpath)"
-						opacity={reflection * 0.4}
-						style={{ transition: 'opacity 600ms ease-out' }}
-					/>
-				</g>
-				<rect x="0" y={BASE - 0.5} width={VB_W} height="1" fill="rgba(255,255,255,0.14)" />
-			</svg>
-
-			{header}
-
-			<section className="relative z-3 flex flex-col gap-2 px-6 pt-8.5" aria-label="Countdown">
-				<p className="text-[15px] font-medium tracking-[-0.005em] text-white/80">{eyebrow}</p>
-				{night && (
-					<p
-						className="text-[clamp(54px,17vw,78px)] leading-[0.95] font-semibold tracking-[-0.045em] text-white tabular-nums [text-shadow:0_2px_30px_rgba(0,0,0,0.25)]"
-						role="timer"
-						aria-label={eyebrow}
-					>
-						{hm}
-						<span className="opacity-40">{ss}</span>
-					</p>
-				)}
-				<p className="text-sm text-white/55 tabular-nums">{caption}</p>
-			</section>
-
-			{night && (
-				<ol className="sk-lamps" aria-label="Schedule">
-					{night.marks.map((m, i) => (
-						<li
-							key={m.key}
-							aria-current={m.next ? 'true' : undefined}
-							data-passed={now >= m.time ? '' : undefined}
-							data-edge={i === 0 ? 'start' : i === night.marks.length - 1 ? 'end' : undefined}
-							style={{ left: `${m.pos * 100}%`, '--i': i } as CSSProperties}
+				<svg
+					className="sk-scene"
+					viewBox={`0 0 ${VB_W} ${VB_H}`}
+					preserveAspectRatio="xMidYMax slice"
+					aria-hidden="true"
+				>
+					<defs>
+						<linearGradient id="sk-water" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0" stopColor="var(--water-a)" />
+							<stop offset="1" stopColor="#03040c" />
+						</linearGradient>
+						<linearGradient id="sk-fade" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0" stopColor="#fff" stopOpacity="0.9" />
+							<stop offset="0.5" stopColor="#fff" stopOpacity="0.25" />
+							<stop offset="1" stopColor="#fff" stopOpacity="0" />
+						</linearGradient>
+						<mask
+							id="sk-reflect-mask"
+							maskUnits="userSpaceOnUse"
+							x={-EXT}
+							y={BASE}
+							width={VB_W + EXT * 2}
+							height={VB_H - BASE}
 						>
-							<span className="sk-lamp" />
-							<span className="sk-name">{m.label}</span>
-							<time dateTime={m.time.toISOString()}>{formatTime(m.time)}</time>
-						</li>
-					))}
-				</ol>
-			)}
+							<rect
+								x={-EXT}
+								y={BASE}
+								width={VB_W + EXT * 2}
+								height={VB_H - BASE}
+								fill="url(#sk-fade)"
+							/>
+						</mask>
+						<linearGradient id="sk-moonpath" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0" stopColor="#dfe5ff" stopOpacity="0.9" />
+							<stop offset="1" stopColor="#dfe5ff" stopOpacity="0" />
+						</linearGradient>
+						<pattern id="sk-ripple" width="6" height="3.4" patternUnits="userSpaceOnUse">
+							<rect width="6" height="1.1" fill="#fff" />
+						</pattern>
+						<mask
+							id="sk-ripple-mask"
+							maskUnits="userSpaceOnUse"
+							x={-EXT}
+							y={BASE}
+							width={VB_W + EXT * 2}
+							height={VB_H - BASE}
+						>
+							<rect
+								x={-EXT}
+								y={BASE}
+								width={VB_W + EXT * 2}
+								height={VB_H - BASE}
+								fill="url(#sk-ripple)"
+							/>
+						</mask>
+						<g id="sk-city">
+							<City />
+						</g>
+					</defs>
+
+					<use href="#sk-city" />
+					<rect
+						x={-EXT}
+						y={BASE}
+						width={VB_W + EXT * 2}
+						height={VB_H - BASE}
+						fill="url(#sk-water)"
+					/>
+					<g mask="url(#sk-reflect-mask)">
+						<use
+							href="#sk-city"
+							transform={`translate(0 ${BASE * 2}) scale(1 -1)`}
+							opacity="0.32"
+						/>
+					</g>
+					<g mask="url(#sk-ripple-mask)">
+						<rect
+							x={(cx + w * ((SCENE - 1) / 2)) / scale - 9}
+							y={BASE + 2}
+							width="18"
+							height="150"
+							fill="url(#sk-moonpath)"
+							opacity={reflection * 0.4}
+							style={{ transition: 'opacity 600ms ease-out' }}
+						/>
+					</g>
+					<rect
+						x={-EXT}
+						y={BASE - 0.5}
+						width={VB_W + EXT * 2}
+						height="1"
+						fill="rgba(255,255,255,0.14)"
+					/>
+				</svg>
+
+				{header}
+
+				<section className="relative z-3 flex flex-col gap-2 px-6 pt-8.5" aria-label="Countdown">
+					<p className="text-[15px] font-medium tracking-[-0.005em] text-white/80">{eyebrow}</p>
+					{night && (
+						<p
+							className="text-[clamp(54px,17vw,78px)] leading-[0.95] font-semibold tracking-[-0.045em] text-white tabular-nums [text-shadow:0_2px_30px_rgba(0,0,0,0.25)]"
+							role="timer"
+							aria-label={eyebrow}
+						>
+							{hm}
+							<span className="opacity-40">{ss}</span>
+						</p>
+					)}
+					<p className="text-sm text-white/55 tabular-nums">{caption}</p>
+				</section>
+
+				{night && (
+					<ol className="sk-lamps" aria-label="Schedule">
+						{night.marks.map((m, i) => (
+							<li
+								key={m.key}
+								aria-current={m.next ? 'true' : undefined}
+								data-passed={now >= m.time ? '' : undefined}
+								data-edge={i === 0 ? 'start' : i === night.marks.length - 1 ? 'end' : undefined}
+								style={{ left: `${m.pos * 100}%`, '--i': i } as CSSProperties}
+							>
+								<span className="sk-lamp" />
+								<span className="sk-name">{m.label}</span>
+								<time dateTime={m.time.toISOString()}>{formatTime(m.time)}</time>
+							</li>
+						))}
+					</ol>
+				)}
+			</div>
 		</div>
 	);
 }
