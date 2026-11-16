@@ -1,14 +1,12 @@
 const KEY = '2a99f189-6e3b-4015-8fb8-ff277642561d';
 const BASE = 'https://www.londonprayertimes.com/api/times/';
 
-function todayStr(): string {
-	return new Date().toISOString().split('T')[0];
-}
+const LONDON_TZ = 'Europe/London';
 
-function tomorrowStr(): string {
-	const d = new Date();
-	d.setDate(d.getDate() + 1);
-	return d.toISOString().split('T')[0];
+/** YYYY-MM-DD for a given instant in London (en-CA formats as ISO). */
+function londonDate(offsetDays = 0): string {
+	const d = new Date(Date.now() + offsetDays * 86400000);
+	return new Intl.DateTimeFormat('en-CA', { timeZone: LONDON_TZ }).format(d);
 }
 
 export interface LondonTimes {
@@ -17,7 +15,7 @@ export interface LondonTimes {
 }
 
 export async function fetchLondonTimes(): Promise<LondonTimes> {
-	const today = todayStr();
+	const today = londonDate();
 
 	// Return cached values if already fetched today
 	if (localStorage.getItem('apiDate') === today) {
@@ -26,7 +24,7 @@ export async function fetchLondonTimes(): Promise<LondonTimes> {
 		if (m && f) return { maghrib: m, fajr: f };
 	}
 
-	const tomorrow = tomorrowStr();
+	const tomorrow = londonDate(1);
 	const params = `format=json&key=${KEY}&24hours=true`;
 
 	const [todayRes, tomorrowRes] = await Promise.all([

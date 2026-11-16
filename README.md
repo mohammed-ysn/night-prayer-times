@@ -15,4 +15,4 @@ pnpm dev
 pnpm build
 ```
 
-Outputs static files to `build/` for deployment to GitHub Pages.
+Outputs static files to `dist/` for deployment to GitHub Pages.

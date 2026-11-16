@@ -9,7 +9,7 @@ const iconsDir = join(__dirname, '../static/icons');
 const sizes = [192, 512];
 
 const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="64" fill="#1a1a2e"/>
+  <rect width="512" height="512" rx="64" fill="#0b0d14"/>
   <defs>
     <mask id="moon-mask">
       <circle cx="256" cy="256" r="140" fill="white"/>
