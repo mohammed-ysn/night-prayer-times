@@ -9,17 +9,18 @@ import { usePrayerSource, type Source } from '@/hooks/use-prayer-source';
 import { getNight } from '@/lib/night';
 import { calculateTimes } from '@/lib/time';
 
-const today = new Intl.DateTimeFormat('en-GB', {
+const dateFormat = new Intl.DateTimeFormat('en-GB', {
 	weekday: 'short',
 	day: 'numeric',
 	month: 'short'
-}).format(new Date());
+});
 
 export function App() {
 	const now = useNow();
 	const p = usePrayerSource();
 	const times = p.times ? calculateTimes(p.times.maghrib, p.times.fajr) : null;
 	const night = times ? getNight(times, now) : null;
+	const loading = p.source === 'london' && p.fetchState === 'loading';
 
 	return (
 		<main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]">
@@ -28,7 +29,7 @@ export function App() {
 			<header className="rise flex items-center justify-between" style={{ '--i': 0 } as never}>
 				<h1 className="text-sm font-medium tracking-tight">Tonight</h1>
 				<span className="rounded-full border border-border bg-secondary px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-					{today}
+					{dateFormat.format(now)}
 				</span>
 			</header>
 
@@ -48,23 +49,13 @@ export function App() {
 				</TabsList>
 			</Tabs>
 
-			{p.source === 'manual' && (
-				<div className="rise mt-6" style={{ '--i': 2 } as never}>
-					<ManualForm
-						value={p.manual}
-						onChange={p.setManualTime}
-						lastSaved={p.lastSaved}
-						error={
-							p.fetchState === 'error'
-								? 'Could not fetch London times. Enter them manually.'
-								: undefined
-						}
-					/>
+			{loading && (
+				<div aria-busy aria-label="Fetching today's times" className="animate-pulse">
+					<div className="mx-auto mt-6 aspect-square w-full max-w-[340px] p-[22px]">
+						<div className="size-full rounded-full border-[16px] border-white/5" />
+					</div>
+					<div className="mt-4 h-[216px] rounded-3xl border border-border bg-card" />
 				</div>
-			)}
-
-			{p.source === 'london' && p.fetchState === 'loading' && (
-				<p className="py-24 text-center text-sm text-muted-foreground">Fetching today's times…</p>
 			)}
 
 			{night && (
@@ -78,7 +69,22 @@ export function App() {
 				</>
 			)}
 
-			<div className="rise mt-4" style={{ '--i': 4 } as never}>
+			{p.source === 'manual' && (
+				<div className="rise mt-4" style={{ '--i': 4 } as never}>
+					<ManualForm
+						value={p.manual}
+						onChange={p.setManualTime}
+						lastSaved={p.lastSaved}
+						error={
+							p.fetchState === 'error'
+								? 'Could not fetch London times. Enter them manually.'
+								: undefined
+						}
+					/>
+				</div>
+			)}
+
+			<div className="rise mt-4" style={{ '--i': 5 } as never}>
 				<About />
 			</div>
 

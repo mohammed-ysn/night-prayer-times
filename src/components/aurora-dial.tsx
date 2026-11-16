@@ -13,8 +13,14 @@ const track = {
 	strokeLinecap: 'round'
 } as const;
 
+const TICKS: [string, number][] = [
+	['third', 1 / 3],
+	['half', 1 / 2],
+	['last', 2 / 3]
+];
+
 export function AuroraDial({ night, now }: { night: Night; now: Date }) {
-	const { f, phase, inNight, target, eyebrow, caption } = night;
+	const { f, phase, inNight, target, eyebrow, caption, marks } = night;
 	const filled = phase === 'before' ? 0 : f;
 	const marker = point(f);
 	const fill = {
@@ -49,9 +55,23 @@ export function AuroraDial({ night, now }: { night: Night; now: Date }) {
 						<path {...track} {...fill} />
 					</>
 				)}
-				{[1 / 3, 1 / 2, 2 / 3].map((k) => (
-					<circle key={k} cx={point(k).x} cy={point(k).y} r={2} className="fill-white/60" />
-				))}
+				{TICKS.map(([key, k]) => {
+					const mark = marks.find((m) => m.key === key);
+					const next = mark?.next;
+					const past = mark ? now >= mark.time : false;
+					return (
+						<circle
+							key={key}
+							cx={point(k).x}
+							cy={point(k).y}
+							r={next ? 3.5 : 2}
+							className={cn(
+								'transition-colors duration-200',
+								next ? 'fill-primary' : past ? 'fill-white/25' : 'fill-white/60'
+							)}
+						/>
+					);
+				})}
 				{inNight && (
 					<g
 						style={{
