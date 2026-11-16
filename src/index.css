@@ -3,29 +3,32 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Night-only palette: ink background, one warm moon accent. */
 :root {
 	--radius: 0.875rem;
 	--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-	--background: oklch(0.155 0.02 265);
-	--foreground: oklch(0.96 0.008 265);
-	--card: oklch(0.195 0.022 265);
+	/* Night-only palette: deep indigo ink, an aurora gradient, one warm gold accent. */
+	--background: #0a0a1c;
+	--foreground: #f4f1ff;
+	--card: oklch(1 0 0 / 5%);
 	--card-foreground: var(--foreground);
-	--popover: oklch(0.225 0.024 265);
+	--popover: #15152e;
 	--popover-foreground: var(--foreground);
-	--primary: oklch(0.86 0.12 85);
-	--primary-foreground: oklch(0.2 0.03 85);
-	--secondary: oklch(0.24 0.024 265);
+	--primary: #ffd37a;
+	--primary-foreground: #2a2008;
+	--secondary: oklch(1 0 0 / 8%);
 	--secondary-foreground: var(--foreground);
-	--muted: oklch(0.22 0.022 265);
-	--muted-foreground: oklch(0.7 0.02 265);
-	--accent: oklch(0.26 0.026 265);
+	--muted: oklch(1 0 0 / 7%);
+	--muted-foreground: oklch(0.78 0.04 290);
+	--accent: oklch(1 0 0 / 10%);
 	--accent-foreground: var(--foreground);
 	--destructive: oklch(0.7 0.19 25);
-	--border: oklch(0.96 0.008 265 / 9%);
-	--input: oklch(0.96 0.008 265 / 14%);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 16%);
 	--ring: oklch(0.86 0.12 85 / 60%);
-	--dusk: oklch(0.62 0.12 265);
+	--aurora-1: #6d6bff;
+	--aurora-2: #b46bff;
+	--aurora-3: #ff8fb1;
+	--aurora-4: #ffd37a;
 	--warn: oklch(0.82 0.14 80);
 	--ok: oklch(0.78 0.12 160);
 }
@@ -55,7 +58,10 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
-	--color-dusk: var(--dusk);
+	--color-aurora-1: var(--aurora-1);
+	--color-aurora-2: var(--aurora-2);
+	--color-aurora-3: var(--aurora-3);
+	--color-aurora-4: var(--aurora-4);
 	--color-warn: var(--warn);
 	--color-ok: var(--ok);
 }
