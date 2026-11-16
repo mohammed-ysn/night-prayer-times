@@ -1,12 +1,13 @@
+import { useEffect } from 'react';
 import { About } from '@/components/about';
 import { ManualForm } from '@/components/manual-form';
 import { Skyline } from '@/components/skyline';
+import { SourceToggle } from '@/components/source-toggle';
 import { Button } from '@/components/ui/button';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useNow } from '@/hooks/use-now';
-import { usePrayerSource, type Source } from '@/hooks/use-prayer-source';
 import { getNight } from '@/lib/night';
 import { calculateTimes } from '@/lib/time';
+import { useActiveSource, useActiveTimes, usePrayerStore } from '@/stores/prayer-store';
 
 const dateFormat = new Intl.DateTimeFormat('en-GB', {
 	weekday: 'short',
@@ -14,23 +15,25 @@ const dateFormat = new Intl.DateTimeFormat('en-GB', {
 	month: 'short'
 });
 
-const sourceItem =
-	'h-[26px] rounded-full px-3 text-[11px] font-medium tracking-[0.08em] text-white/55 uppercase ' +
-	'transition-[color,background-color,transform] duration-150 ease-out active:scale-[0.97] ' +
-	'hover:bg-transparent hover:text-white data-[state=on]:bg-white/16 data-[state=on]:text-white';
-
 export function App() {
 	const now = useNow();
-	const p = usePrayerSource();
-	const times = p.times ? calculateTimes(p.times.maghrib, p.times.fajr) : null;
-	const night = times ? getNight(times, now) : null;
-	const loading = p.source === 'london' && p.fetchState === 'loading';
+	const source = useActiveSource();
+	const loading = usePrayerStore((s) => s.fetchState === 'loading');
+	const activeTimes = useActiveTimes();
 
-	const status = loading
-		? "Fetching today's times…"
-		: p.source === 'manual'
-			? 'Enter Maghrib and Fajr below'
-			: undefined;
+	useEffect(() => {
+		void usePrayerStore.getState().fetchLondon();
+	}, []);
+
+	const times = activeTimes ? calculateTimes(activeTimes.maghrib, activeTimes.fajr) : null;
+	const night = times ? getNight(times, now) : null;
+
+	const status =
+		source === 'london' && loading
+			? "Fetching today's times…"
+			: source === 'manual'
+				? 'Enter Maghrib and Fajr below'
+				: undefined;
 
 	return (
 		<main>
@@ -41,39 +44,14 @@ export function App() {
 				header={
 					<header className="relative z-4 flex items-center justify-between pt-[calc(env(safe-area-inset-top)+20px)] pr-5 pl-6 text-[11px] font-medium tracking-[0.1em] text-white/60 uppercase">
 						<span>Tonight · {dateFormat.format(now)}</span>
-						<ToggleGroup
-							type="single"
-							spacing={0.5}
-							value={p.source}
-							onValueChange={(v) => v && p.chooseSource(v as Source)}
-							aria-label="Times source"
-							className="rounded-full bg-white/8 p-0.5 ring-1 ring-white/8"
-						>
-							<ToggleGroupItem value="london" className={sourceItem}>
-								London
-							</ToggleGroupItem>
-							<ToggleGroupItem value="manual" className={sourceItem}>
-								Manual
-							</ToggleGroupItem>
-						</ToggleGroup>
+						<SourceToggle />
 					</header>
 				}
 			/>
 
 			<div className="bg-[#03040c]">
 				<div className="mx-auto flex max-w-120 flex-col gap-7 px-6 pt-7 pb-[calc(env(safe-area-inset-bottom)+40px)] text-sm leading-normal">
-					{p.source === 'manual' && (
-						<ManualForm
-							value={p.manual}
-							onChange={p.setManualTime}
-							lastSaved={p.lastSaved}
-							error={
-								p.fetchState === 'error'
-									? 'Could not fetch London times. Enter them manually.'
-									: undefined
-							}
-						/>
-					)}
+					{source === 'manual' && <ManualForm />}
 
 					<About />
 

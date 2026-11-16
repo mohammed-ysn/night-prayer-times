@@ -2,21 +2,18 @@ import { TriangleAlert } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { TimeField } from '@/components/time-field';
-import type { Times } from '@/hooks/use-prayer-source';
+import { formatSavedDate } from '@/lib/time';
+import { usePrayerStore } from '@/stores/prayer-store';
 
 const hourOf = (v: string) => (v ? Number(v.split(':')[0]) : null);
 
-export function ManualForm({
-	value,
-	onChange,
-	lastSaved,
-	error
-}: {
-	value: Times;
-	onChange: (key: keyof Times, v: string) => void;
-	lastSaved: string;
-	error?: string;
-}) {
+export function ManualForm() {
+	const value = usePrayerStore((s) => s.manual);
+	const savedDate = usePrayerStore((s) => s.savedDate);
+	const setManualTime = usePrayerStore((s) => s.setManualTime);
+	const failed = usePrayerStore((s) => s.fetchState === 'error');
+	const error = failed ? 'Could not fetch London times. Enter them manually.' : undefined;
+
 	const mh = hourOf(value.maghrib);
 	const fh = hourOf(value.fajr);
 	const maghribOff = mh !== null && (mh < 13 || mh > 23);
@@ -41,7 +38,7 @@ export function ManualForm({
 					<TimeField
 						id="maghrib"
 						value={value.maghrib}
-						onChange={(v) => onChange('maghrib', v)}
+						onChange={(v) => setManualTime('maghrib', v)}
 						defaultValue="18:00"
 						invalid={maghribOff}
 					/>
@@ -51,7 +48,7 @@ export function ManualForm({
 					<TimeField
 						id="fajr"
 						value={value.fajr}
-						onChange={(v) => onChange('fajr', v)}
+						onChange={(v) => setManualTime('fajr', v)}
 						defaultValue="05:00"
 						invalid={fajrOff}
 					/>
@@ -63,7 +60,9 @@ export function ManualForm({
 					<AlertDescription className="text-gold/90">{w}</AlertDescription>
 				</Alert>
 			))}
-			{lastSaved && <p className="text-xs text-muted-foreground">Saved {lastSaved}</p>}
+			{savedDate && (
+				<p className="text-xs text-muted-foreground">Saved {formatSavedDate(savedDate)}</p>
+			)}
 		</form>
 	);
 }

@@ -70,3 +70,14 @@ export function formatCountdown(ms: number): string {
 	const s = (total % 60).toString().padStart(2, '0');
 	return `${h}:${m}:${s}`;
 }
+
+/** "16 Nov, 9:53 pm" for an ISO timestamp. */
+export function formatSavedDate(iso: string): string {
+	return new Date(iso).toLocaleDateString('en-GB', {
+		day: 'numeric',
+		month: 'short',
+		hour: 'numeric',
+		minute: '2-digit',
+		hour12: true
+	});
+}
