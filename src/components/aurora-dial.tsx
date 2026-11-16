@@ -13,10 +13,10 @@ const track = {
 	strokeLinecap: 'round'
 } as const;
 
-const TICKS: [string, number][] = [
-	['third', 1 / 3],
-	['half', 1 / 2],
-	['last', 2 / 3]
+const TICKS: [string, number, string][] = [
+	['third', 1 / 3, '⅓'],
+	['half', 1 / 2, '½'],
+	['last', 2 / 3, '⅔']
 ];
 
 export function AuroraDial({ night, now }: { night: Night; now: Date }) {
@@ -55,28 +55,44 @@ export function AuroraDial({ night, now }: { night: Night; now: Date }) {
 						<path {...track} {...fill} />
 					</>
 				)}
-				{TICKS.map(([key, k]) => {
+				{TICKS.map(([key, k, label]) => {
 					const mark = marks.find((m) => m.key === key);
 					const next = mark?.next;
 					const past = mark ? now >= mark.time : false;
+					const at = point(k);
+					const labelAt = point(k, 140);
 					return (
-						<circle
-							key={key}
-							cx={point(k).x}
-							cy={point(k).y}
-							r={next ? 3.5 : 2}
-							className={cn(
-								'transition-colors duration-200',
-								next ? 'fill-primary' : past ? 'fill-white/25' : 'fill-white/60'
-							)}
-						/>
+						<g key={key}>
+							<circle
+								cx={at.x}
+								cy={at.y}
+								r={next ? 3.5 : 2}
+								className={cn(
+									'transition-colors duration-200',
+									next ? 'fill-primary' : past ? 'fill-white/25' : 'fill-white/60'
+								)}
+							/>
+							<text
+								x={labelAt.x}
+								y={labelAt.y}
+								textAnchor="middle"
+								dominantBaseline="central"
+								className={cn(
+									'text-[10px] transition-colors duration-200',
+									next ? 'fill-primary' : 'fill-white/40'
+								)}
+							>
+								{label}
+							</text>
+						</g>
 					);
 				})}
 				{inNight && (
 					<g
+						className="starting:opacity-0"
 						style={{
 							transform: `translate(${marker.x}px, ${marker.y}px)`,
-							transition: 'transform 1s linear'
+							transition: 'transform 1s linear, opacity 200ms var(--ease-out)'
 						}}
 					>
 						<circle r={18} fill="#fff" opacity={0.18} filter="url(#aurora-glow)" />
@@ -89,6 +105,7 @@ export function AuroraDial({ night, now }: { night: Night; now: Date }) {
 				<p className="text-sm text-muted-foreground">{eyebrow}</p>
 				<p
 					className="mt-1 bg-gradient-to-b from-white to-[#c9bcff] bg-clip-text font-mono text-5xl font-extralight tabular-nums tracking-tight text-transparent"
+					role="timer"
 					aria-label={eyebrow}
 				>
 					{target ? formatCountdown(target.getTime() - now.getTime()) : '—'}

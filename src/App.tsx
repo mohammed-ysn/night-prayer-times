@@ -15,6 +15,10 @@ const dateFormat = new Intl.DateTimeFormat('en-GB', {
 	month: 'short'
 });
 
+// The sliding pill behind the tabs draws the active state, so the trigger itself stays clear.
+const TAB =
+	'rounded-full data-[state=active]:border-transparent data-[state=active]:bg-transparent dark:data-[state=active]:border-transparent dark:data-[state=active]:bg-transparent';
+
 export function App() {
 	const now = useNow();
 	const p = usePrayerSource();
@@ -39,11 +43,16 @@ export function App() {
 				className="rise mt-5"
 				style={{ '--i': 1 } as never}
 			>
-				<TabsList className="grid w-full grid-cols-2 rounded-full">
-					<TabsTrigger value="london" className="rounded-full">
+				<TabsList className="relative grid h-11! w-full grid-cols-2 rounded-full">
+					<span
+						aria-hidden
+						className="absolute inset-y-[3px] left-[3px] w-[calc(50%-3px)] rounded-full border border-input bg-input/30 transition-transform duration-200 ease-[var(--ease-out)]"
+						style={{ transform: p.source === 'manual' ? 'translateX(100%)' : 'none' }}
+					/>
+					<TabsTrigger value="london" className={TAB}>
 						London
 					</TabsTrigger>
-					<TabsTrigger value="manual" className="rounded-full">
+					<TabsTrigger value="manual" className={TAB}>
 						Manual
 					</TabsTrigger>
 				</TabsList>
@@ -88,9 +97,9 @@ export function App() {
 				<About />
 			</div>
 
-			<footer className="mt-auto flex items-center justify-center gap-4 pt-10 text-xs text-muted-foreground">
+			<footer className="mt-auto flex items-center justify-center gap-4 pt-7 text-xs text-muted-foreground">
 				<a
-					className="rounded px-1 py-1 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+					className="rounded px-1 py-3 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
 					href="https://github.com/mohammed-ysn/night-prayer-times/issues"
 					target="_blank"
 					rel="noopener noreferrer"
@@ -99,7 +108,7 @@ export function App() {
 				</a>
 				<span aria-hidden>·</span>
 				<a
-					className="rounded px-1 py-1 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+					className="rounded px-1 py-3 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
 					href="mailto:mohammedysn15@gmail.com"
 				>
 					Email

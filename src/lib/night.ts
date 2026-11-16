@@ -26,10 +26,12 @@ export function getNight(times: PrayerTimes, now: Date) {
 	];
 	const step = steps.find(([, end]) => now < end);
 	const phase: Phase = step ? step[0] : 'after';
-	const target = step ? step[1] : null;
-	const eyebrow = step ? step[2] : 'Night has ended';
+	// After Fajr, count down to tomorrow's Maghrib (assumed close to today's).
+	const nextMaghrib = new Date(start + 24 * 60 * 60 * 1000);
+	const target = step ? step[1] : nextMaghrib;
+	const eyebrow = step ? step[2] : 'Maghrib in';
 
-	const caption = target ? `at ${formatTime(target)}` : `Fajr was ${formatTime(times.fajrTime)}`;
+	const caption = step ? `at ${formatTime(target)}` : `around ${formatTime(target)}`;
 
 	const base: Mark[] = [
 		{ key: 'maghrib', label: 'Maghrib', time: times.maghribTime },

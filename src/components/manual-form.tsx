@@ -67,7 +67,7 @@ function Notice({ children }: { children: React.ReactNode }) {
 	return (
 		<p
 			role="status"
-			className="flex items-start gap-2 rounded-lg border border-warn/25 bg-warn/10 px-3 py-2 text-xs text-warn"
+			className="flex items-start gap-2 rounded-lg border border-warn/25 bg-warn/10 px-3 py-2 text-xs text-warn transition-[opacity,translate] duration-200 ease-[var(--ease-out)] starting:-translate-y-1 starting:opacity-0"
 		>
 			<TriangleAlert className="mt-px size-3.5 shrink-0" />
 			{children}

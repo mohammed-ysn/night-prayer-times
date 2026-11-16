@@ -11,7 +11,7 @@ export function Schedule({ night, now }: { night: Night; now: Date }) {
 					className={cn(
 						'flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-[opacity,background-color] duration-200 ease-[var(--ease-out)]',
 						m.next && 'bg-primary/10',
-						now >= m.time && 'opacity-45'
+						now >= m.time && 'opacity-60'
 					)}
 				>
 					<span

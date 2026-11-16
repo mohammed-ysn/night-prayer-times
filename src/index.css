@@ -91,12 +91,18 @@
 			border-color 160ms ease,
 			box-shadow 160ms ease;
 	}
-	button:not(:disabled):active {
+	button:not(:disabled):not([data-no-press]):active {
 		transform: scale(0.97);
 	}
 	/* iOS zooms inputs under 16px. */
 	input {
 		font-size: 16px;
+	}
+}
+
+@keyframes rise-fade {
+	from {
+		opacity: 0;
 	}
 }
 
@@ -113,8 +119,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+	/* Gentler, not none: keep the fade, drop the movement. */
 	.rise {
-		animation: none;
+		animation-name: rise-fade;
 	}
 	* {
 		transition-duration: 0.01ms !important;
