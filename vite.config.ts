@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	base: process.env.NODE_ENV === 'production' ? '/night-prayer-times/' : '/',
+	server: { open: true },
 	plugins: [react(), tailwindcss()],
 	resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } }
 });
