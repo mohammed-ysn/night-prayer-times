@@ -1,5 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react';
-import { useIntroValue } from '@/hooks/use-smooth';
+import { useCallback, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useSmoothValue } from '@/hooks/use-smooth';
 import { useSize } from '@/hooks/use-size';
 import { moonPhase } from '@/lib/moon';
 import type { Night } from '@/lib/night';
@@ -106,7 +106,8 @@ interface SkylineProps {
  */
 export function Skyline({ night, now, status, header }: SkylineProps) {
 	const [ref, { w, h }] = useSize<HTMLDivElement>();
-	const f = useIntroValue(night ? night.f : 0.5);
+	const moonEl = useRef<HTMLDivElement>(null);
+	const pathEl = useRef<HTMLDivElement>(null);
 
 	const phase = night?.phase ?? 'between';
 	const moonOn = night?.inNight ?? false;
@@ -118,10 +119,23 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 
 	const scale = (w * SCENE) / VB_W;
 	const yHor = h - VB_H * scale + BASE * scale;
-	const lift = Math.sin(Math.PI * f);
-	const cx = w * 0.12 + w * 0.76 * f;
-	const cy = yHor + 26 - (yHor + 26 - h * 0.33) * lift;
-	const reflection = moonOn ? 0.22 + 0.55 * lift : 0;
+
+	// Moon and its reflection are positioned straight on the DOM each frame: no re-render.
+	const place = useCallback(
+		(f: number) => {
+			const lift = Math.sin(Math.PI * f);
+			const cx = w * 0.12 + w * 0.76 * f;
+			const cy = yHor + 26 - (yHor + 26 - h * 0.33) * lift;
+			if (moonEl.current)
+				moonEl.current.style.transform = `translate3d(${cx - 34}px, ${cy - 34}px, 0)`;
+			if (pathEl.current) {
+				pathEl.current.style.transform = `translate3d(${cx - 9 * scale}px, 0, 0)`;
+				pathEl.current.style.opacity = String(moonOn ? (0.22 + 0.55 * lift) * 0.4 : 0);
+			}
+		},
+		[w, h, yHor, scale, moonOn]
+	);
+	useSmoothValue(night ? night.f : 0.5, place);
 
 	return (
 		<div className="sky sk" data-phase={phase} data-idle={night ? undefined : ''}>
@@ -133,10 +147,8 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 				<div
 					className="sk-moon"
 					aria-hidden="true"
-					style={{
-						transform: `translate3d(${cx - 34}px, ${cy - 34}px, 0)`,
-						opacity: moonOn ? 1 : 0
-					}}
+					ref={moonEl}
+					style={{ opacity: moonOn ? 1 : 0 }}
 				>
 					<div className="sk-moon-halo" />
 					<Moon phase={moonPhase(now)} size={68} />
@@ -174,29 +186,6 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 								fill="url(#sk-fade)"
 							/>
 						</mask>
-						<linearGradient id="sk-moonpath" x1="0" y1="0" x2="0" y2="1">
-							<stop offset="0" stopColor="#dfe5ff" stopOpacity="0.9" />
-							<stop offset="1" stopColor="#dfe5ff" stopOpacity="0" />
-						</linearGradient>
-						<pattern id="sk-ripple" width="6" height="3.4" patternUnits="userSpaceOnUse">
-							<rect width="6" height="1.1" fill="#fff" />
-						</pattern>
-						<mask
-							id="sk-ripple-mask"
-							maskUnits="userSpaceOnUse"
-							x={-EXT}
-							y={BASE}
-							width={VB_W + EXT * 2}
-							height={VB_H - BASE}
-						>
-							<rect
-								x={-EXT}
-								y={BASE}
-								width={VB_W + EXT * 2}
-								height={VB_H - BASE}
-								fill="url(#sk-ripple)"
-							/>
-						</mask>
 						<g id="sk-city">
 							<City />
 						</g>
@@ -217,17 +206,6 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 							opacity="0.32"
 						/>
 					</g>
-					<g mask="url(#sk-ripple-mask)">
-						<rect
-							x={(cx + w * ((SCENE - 1) / 2)) / scale - 9}
-							y={BASE + 2}
-							width="18"
-							height="150"
-							fill="url(#sk-moonpath)"
-							opacity={reflection * 0.4}
-							style={{ transition: 'opacity 600ms ease-out' }}
-						/>
-					</g>
 					<rect
 						x={-EXT}
 						y={BASE - 0.5}
@@ -236,6 +214,20 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 						fill="rgba(255,255,255,0.14)"
 					/>
 				</svg>
+
+				<div
+					ref={pathEl}
+					className="sk-path"
+					aria-hidden="true"
+					style={
+						{
+							top: yHor + 2 * scale,
+							width: 18 * scale,
+							height: 150 * scale,
+							'--period': `${3.4 * scale}px`
+						} as CSSProperties
+					}
+				/>
 
 				{header}
 
