@@ -201,3 +201,25 @@
 .sk[data-idle] .sk-col {
 	min-height: 560px;
 }
+
+/* The ? pulses until a newcomer has opened it once. */
+.sk-help {
+	position: relative;
+}
+.sk-help[data-nudge] {
+	color: var(--lamp);
+}
+.sk-help[data-nudge]::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	border: 1.5px solid rgba(255, 220, 150, 0.7);
+	animation: sk-ping 2.6s var(--ease-out) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+	.sk-help[data-nudge]::after {
+		animation: none;
+		opacity: 0.5;
+	}
+}

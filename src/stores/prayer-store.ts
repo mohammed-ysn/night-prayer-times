@@ -24,9 +24,12 @@ interface PrayerState {
 	manual: ManualTimes;
 	/** When a manual time was last changed (ISO). Persisted. */
 	savedDate: string | null;
+	/** Whether the ? beside the countdown has been opened. Persisted. */
+	helpSeen: boolean;
 	london: Times | null;
 	fetchState: FetchState;
 	chooseSource: (source: Source) => void;
+	markHelpSeen: () => void;
 	setManualTime: (key: keyof ManualTimes, value: string) => void;
 	fetchLondon: () => Promise<void>;
 }
@@ -37,10 +40,13 @@ export const usePrayerStore = create<PrayerState>()(
 			source: 'london',
 			manual: { maghrib: '', fajr: '' },
 			savedDate: null,
+			helpSeen: false,
 			london: null,
 			fetchState: 'idle',
 
 			chooseSource: (source) => set({ source }),
+
+			markHelpSeen: () => set({ helpSeen: true }),
 
 			setManualTime: (key, value) =>
 				set((s) => ({
@@ -61,7 +67,12 @@ export const usePrayerStore = create<PrayerState>()(
 		{
 			name: 'night-prayer',
 			version: 1,
-			partialize: ({ source, manual, savedDate }) => ({ source, manual, savedDate }),
+			partialize: ({ source, manual, savedDate, helpSeen }) => ({
+				source,
+				manual,
+				savedDate,
+				helpSeen
+			}),
 			// Manual times go stale: drop them after 30 days.
 			merge: (persisted, current) => {
 				const saved = persisted as Partial<PrayerState> | undefined;
