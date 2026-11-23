@@ -1,7 +1,7 @@
-import { memo, useId } from 'react';
+import { useId } from 'react';
 
 /** A moon with a real terminator for the given phase. */
-export const Moon = memo(function Moon({ phase, size }: { phase: number; size: number }) {
+export function Moon({ phase, size }: { phase: number; size: number }) {
 	const id = useId().replace(/:/g, '');
 	const pp = phase < 0.5 ? phase : 1 - phase;
 	const flip = phase >= 0.5;
@@ -48,4 +48,4 @@ export const Moon = memo(function Moon({ phase, size }: { phase: number; size: n
 			<circle r="49.6" fill="none" stroke="rgba(255,255,255,0.1)" />
 		</svg>
 	);
-});
+}
