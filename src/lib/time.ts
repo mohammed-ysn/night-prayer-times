@@ -1,12 +1,14 @@
 export interface PrayerTimes {
 	maghribTime: Date;
 	fajrTime: Date;
+	/** When Isha begins. Only known for London times, and only if it falls before the first third. */
+	ishaTime?: Date;
 	endOfIshaThird: Date;
 	endOfIsha: Date;
 	lastThird: Date;
 }
 
-export function calculateTimes(maghribStr: string, fajrStr: string): PrayerTimes {
+export function calculateTimes(maghribStr: string, fajrStr: string, ishaStr?: string): PrayerTimes {
 	const now = new Date();
 	const [maghribH, maghribM] = maghribStr.split(':').map(Number);
 	const [fajrH, fajrM] = fajrStr.split(':').map(Number);
@@ -35,7 +37,16 @@ export function calculateTimes(maghribStr: string, fajrStr: string): PrayerTimes
 	const endOfIsha = new Date(maghribTime.getTime() + diff * 0.5);
 	const lastThird = new Date(maghribTime.getTime() + diff * (2 / 3));
 
-	return { maghribTime, fajrTime, endOfIshaThird, endOfIsha, lastThird };
+	let ishaTime: Date | undefined;
+	if (ishaStr) {
+		const [ishaH, ishaM] = ishaStr.split(':').map(Number);
+		const candidate = new Date(maghribTime);
+		candidate.setHours(ishaH, ishaM, 0, 0);
+		if (candidate <= maghribTime) candidate.setDate(candidate.getDate() + 1);
+		if (candidate < endOfIshaThird) ishaTime = candidate;
+	}
+
+	return { maghribTime, fajrTime, ishaTime, endOfIshaThird, endOfIsha, lastThird };
 }
 
 export function formatTime(date: Date): string {

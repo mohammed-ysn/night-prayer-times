@@ -12,6 +12,7 @@ function londonDate(offsetDays = 0): string {
 export interface LondonTimes {
 	maghrib: string;
 	fajr: string;
+	isha?: string;
 }
 
 export async function fetchLondonTimes(): Promise<LondonTimes> {
@@ -21,7 +22,8 @@ export async function fetchLondonTimes(): Promise<LondonTimes> {
 	if (localStorage.getItem('apiDate') === today) {
 		const m = localStorage.getItem('apiMaghrib');
 		const f = localStorage.getItem('apiFajr');
-		if (m && f) return { maghrib: m, fajr: f };
+		const i = localStorage.getItem('apiIsha');
+		if (m && f && i) return { maghrib: m, fajr: f, isha: i };
 	}
 
 	const tomorrow = londonDate(1);
@@ -39,18 +41,22 @@ export async function fetchLondonTimes(): Promise<LondonTimes> {
 
 	const m: string = todayData.magrib || todayData.maghrib;
 	const f: string = tomorrowData.fajr;
+	const i: string | undefined = todayData.isha || undefined;
 
 	if (!m || !f) throw new Error('Unexpected response format');
 
 	localStorage.setItem('apiDate', today);
 	localStorage.setItem('apiMaghrib', m);
 	localStorage.setItem('apiFajr', f);
+	if (i) localStorage.setItem('apiIsha', i);
+	else localStorage.removeItem('apiIsha');
 
-	return { maghrib: m, fajr: f };
+	return { maghrib: m, fajr: f, isha: i };
 }
 
 export function getCachedLondonTimes(): LondonTimes | null {
 	const m = localStorage.getItem('apiMaghrib');
 	const f = localStorage.getItem('apiFajr');
-	return m && f ? { maghrib: m, fajr: f } : null;
+	const i = localStorage.getItem('apiIsha') ?? undefined;
+	return m && f ? { maghrib: m, fajr: f, isha: i } : null;
 }

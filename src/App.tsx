@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { About } from '@/components/about';
 import { ManualForm } from '@/components/manual-form';
 import { Skyline } from '@/components/skyline';
 import { SourceToggle } from '@/components/source-toggle';
@@ -25,7 +24,9 @@ export function App() {
 		void usePrayerStore.getState().fetchLondon();
 	}, []);
 
-	const times = activeTimes ? calculateTimes(activeTimes.maghrib, activeTimes.fajr) : null;
+	const times = activeTimes
+		? calculateTimes(activeTimes.maghrib, activeTimes.fajr, activeTimes.isha)
+		: null;
 	const night = times ? getNight(times, now) : null;
 
 	const status =
@@ -52,8 +53,6 @@ export function App() {
 			<div className="bg-[#03040c]">
 				<div className="mx-auto flex max-w-120 flex-col gap-7 px-6 pt-7 pb-[calc(env(safe-area-inset-bottom)+40px)] text-sm leading-normal">
 					{source === 'manual' && <ManualForm />}
-
-					<About />
 
 					<footer className="flex gap-1 text-muted-foreground">
 						<Button variant="link" size="sm" className="h-auto px-0 text-muted-foreground" asChild>

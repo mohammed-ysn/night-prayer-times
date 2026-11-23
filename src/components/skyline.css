@@ -10,13 +10,72 @@
 	z-index: -1;
 }
 
-.sk-lamps {
+.sk-track {
 	position: absolute;
 	left: 28px;
 	right: 28px;
 	bottom: calc(env(safe-area-inset-bottom) + 36px);
 	height: 62px;
 	z-index: 3;
+}
+.sk-lamps {
+	position: absolute;
+	inset: 0;
+}
+/* A line behind the lamps from Isha's start to Fajr; gold marks Isha's time of choice. */
+.sk-band span {
+	position: absolute;
+	top: 3px;
+	height: 3px;
+	border-radius: 2px;
+}
+.sk-permissible {
+	background: rgba(255, 255, 255, 0.16);
+}
+.sk-choice {
+	background: var(--lamp);
+	box-shadow: 0 0 10px rgba(255, 210, 138, 0.5);
+}
+.sk-choice-half {
+	opacity: 0.4;
+	box-shadow: none;
+}
+.sk-hit {
+	display: flex;
+	flex-direction: column;
+	align-items: inherit;
+	gap: 5px;
+	padding: 8px 8px;
+	margin: -8px;
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	border-radius: 8px;
+	outline: none;
+	-webkit-tap-highlight-color: transparent;
+}
+.sk-hit:focus-visible {
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+/* Crowded marks: text above the lamp. */
+.sk-lamps li[data-flip] {
+	top: auto;
+	bottom: calc(100% - 9px);
+}
+.sk-lamps li[data-flip] .sk-hit {
+	gap: 3px;
+}
+.sk-lamps li[data-flip] .sk-name {
+	order: 1;
+}
+.sk-lamps li[data-flip] time {
+	order: 2;
+}
+.sk-lamps li[data-flip] .sk-lamp {
+	order: 3;
+	margin: 3px 0 0;
 }
 .sk-lamps li {
 	position: absolute;

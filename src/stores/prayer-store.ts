@@ -7,22 +7,27 @@ const MAX_AGE_DAYS = 30;
 export type Source = 'london' | 'manual';
 export type FetchState = 'idle' | 'loading' | 'ok' | 'error';
 
-export interface Times {
+export interface ManualTimes {
 	maghrib: string;
 	fajr: string;
+}
+
+export interface Times extends ManualTimes {
+	/** Isha start. London only. */
+	isha?: string;
 }
 
 interface PrayerState {
 	/** Which source the person prefers. Persisted. */
 	source: Source;
 	/** Manually entered times. Persisted. */
-	manual: Times;
+	manual: ManualTimes;
 	/** When a manual time was last changed (ISO). Persisted. */
 	savedDate: string | null;
 	london: Times | null;
 	fetchState: FetchState;
 	chooseSource: (source: Source) => void;
-	setManualTime: (key: keyof Times, value: string) => void;
+	setManualTime: (key: keyof ManualTimes, value: string) => void;
 	fetchLondon: () => Promise<void>;
 }
 
