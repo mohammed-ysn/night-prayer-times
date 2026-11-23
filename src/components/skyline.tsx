@@ -8,6 +8,11 @@ import { Moon } from './moon';
 import { Stars } from './stars';
 import './skyline.css';
 
+// Debug: ?off=stars,twinkle,grain,glow,scene,moon,reflection,lamps,rise hides layers (clip: clips the scene SVG) layers, for bisecting
+// jank on a real device.
+const OFF =
+	new URLSearchParams(window.location.search).get('off')?.split(',').join(' ') || undefined;
+
 // The scene is drawn in a 400×360 box with the waterline at y=200.
 const VB_W = 400;
 const VB_H = 360;
@@ -138,7 +143,7 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 	useSmoothValue(night ? night.f : 0.5, place);
 
 	return (
-		<div className="sky sk" data-phase={phase} data-idle={night ? undefined : ''}>
+		<div className="sky sk" data-phase={phase} data-idle={night ? undefined : ''} data-off={OFF}>
 			<div className="sky-bg" />
 			<div className="sk-glow" style={{ top: yHor - 230, height: 300 }} aria-hidden="true" />
 			<Stars />
@@ -165,27 +170,18 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 							<stop offset="0" stopColor="var(--water-a)" />
 							<stop offset="1" stopColor="#03040c" />
 						</linearGradient>
+						{/* Fades the reflection into the water. A mask this wide is very slow on iOS. */}
 						<linearGradient id="sk-fade" x1="0" y1="0" x2="0" y2="1">
-							<stop offset="0" stopColor="#fff" stopOpacity="0.9" />
-							<stop offset="0.5" stopColor="#fff" stopOpacity="0.25" />
-							<stop offset="1" stopColor="#fff" stopOpacity="0" />
-						</linearGradient>
-						<mask
-							id="sk-reflect-mask"
-							maskUnits="userSpaceOnUse"
-							x={-EXT}
-							y={BASE}
-							width={VB_W + EXT * 2}
-							height={VB_H - BASE}
-						>
-							<rect
-								x={-EXT}
-								y={BASE}
-								width={VB_W + EXT * 2}
-								height={VB_H - BASE}
-								fill="url(#sk-fade)"
+							<stop offset="0" style={{ stopColor: 'var(--water-a)', stopOpacity: 0.1 }} />
+							<stop
+								offset="0.5"
+								style={{
+									stopColor: 'color-mix(in oklab, var(--water-a) 50%, #03040c)',
+									stopOpacity: 0.75
+								}}
 							/>
-						</mask>
+							<stop offset="1" style={{ stopColor: '#03040c', stopOpacity: 1 }} />
+						</linearGradient>
 						<g id="sk-city">
 							<City />
 						</g>
@@ -199,13 +195,14 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 						height={VB_H - BASE}
 						fill="url(#sk-water)"
 					/>
-					<g mask="url(#sk-reflect-mask)">
-						<use
-							href="#sk-city"
-							transform={`translate(0 ${BASE * 2}) scale(1 -1)`}
-							opacity="0.32"
-						/>
-					</g>
+					<use href="#sk-city" transform={`translate(0 ${BASE * 2}) scale(1 -1)`} opacity="0.32" />
+					<rect
+						x={-EXT}
+						y={BASE}
+						width={VB_W + EXT * 2}
+						height={VB_H - BASE}
+						fill="url(#sk-fade)"
+					/>
 					<rect
 						x={-EXT}
 						y={BASE - 0.5}
