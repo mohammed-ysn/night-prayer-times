@@ -141,17 +141,28 @@ function bakeSkyline(cssW: number, cssH: number, dpr: number) {
 	const G = '#0f0';
 	const B = '#00f';
 
+	// Hills repeat sideways, every other tile mirrored so the ridge meets itself at each seam.
+	const tiled = (col: string, d: string) => {
+		const n = Math.ceil(EXT / VB_W);
+		for (let k = -n; k < n + 1; k++) {
+			x.save();
+			if (k % 2 === 0) {
+				x.translate(k * VB_W, 0);
+			} else {
+				x.translate((k + 1) * VB_W, 0);
+				x.scale(-1, 1);
+			}
+			path(col, d);
+			x.restore();
+		}
+	};
 	// far
-	rect(R, -EXT, 150, EXT, 60);
-	rect(R, VB_W, 124, EXT, 86);
-	path(
+	tiled(
 		R,
 		'M0 150 C30 132 60 142 100 128 S170 118 215 132 S300 124 340 120 S390 126 400 124 V210 H0Z'
 	);
 	// mid
-	rect(G, -EXT, 172, EXT, 38);
-	rect(G, VB_W, 160, EXT, 50);
-	path(G, 'M0 172 C50 158 90 170 140 160 S230 150 280 162 S360 156 400 160 V210 H0Z');
+	tiled(G, 'M0 172 C50 158 90 170 140 160 S230 150 280 162 S360 156 400 160 V210 H0Z');
 	// near: ground, main hall + dome, minarets, side domes, houses
 	rect(B, -EXT, 190, EXT, 10);
 	rect(B, VB_W, 190, EXT, 10);
