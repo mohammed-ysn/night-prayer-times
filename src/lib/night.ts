@@ -42,14 +42,14 @@ export function getNight(times: PrayerTimes, now: Date) {
 		steps.push({
 			phase: 'isha',
 			end: times.ishaTime,
-			eyebrow: 'Isha begins in'
+			eyebrow: 'ʿIshāʾ begins in'
 		});
 	}
 	steps.push(
 		{
 			phase: 'isha',
 			end: times.endOfIsha,
-			eyebrow: 'Isha ends in'
+			eyebrow: 'ʿIshāʾ ends in'
 		},
 		{
 			phase: 'between',
@@ -78,7 +78,7 @@ export function getNight(times: PrayerTimes, now: Date) {
 	base.push(
 		{
 			key: 'third',
-			label: 'Isha ends (⅓)',
+			label: 'ʿIshāʾ ends (⅓)',
 			time: times.endOfIshaThird,
 			pos: at(times.endOfIshaThird),
 			secondary: true

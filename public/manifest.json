@@ -1,7 +1,7 @@
 {
 	"name": "Night Prayer Times",
 	"short_name": "Night Prayer",
-	"description": "Calculate Isha end time and the last third of the night for Islamic prayers",
+	"description": "Calculate ʿIshāʾ end time and the last third of the night for Islamic prayers",
 	"start_url": "./",
 	"scope": "./",
 	"display": "standalone",
