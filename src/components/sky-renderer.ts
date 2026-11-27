@@ -159,10 +159,10 @@ function bakeSkyline(cssW: number, cssH: number, dpr: number) {
 	// far
 	tiled(
 		R,
-		'M0 150 C30 132 60 142 100 128 S170 118 215 132 S300 124 340 120 S390 126 400 124 V210 H0Z'
+		'M0 150 C25 150 60 142 100 128 S170 118 215 132 S300 124 340 120 S375 124 400 124 V210 H0Z'
 	);
 	// mid
-	tiled(G, 'M0 172 C50 158 90 170 140 160 S230 150 280 162 S360 156 400 160 V210 H0Z');
+	tiled(G, 'M0 172 C25 172 90 170 140 160 S230 150 280 162 S370 160 400 160 V210 H0Z');
 	// near: ground, main hall + dome, minarets, side domes, houses
 	rect(B, -EXT, 190, EXT, 10);
 	rect(B, VB_W, 190, EXT, 10);
