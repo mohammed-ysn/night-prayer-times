@@ -80,15 +80,10 @@
 	--sb: #5a3366;
 	--sc: #e0734a;
 }
-.sky[data-phase='isha-third'] {
+.sky[data-phase='isha'] {
 	--sa: #0e0f3a;
 	--sb: #2a2468;
 	--sc: #8a4a78;
-}
-.sky[data-phase='isha-half'] {
-	--sa: #0a0b2e;
-	--sb: #17195a;
-	--sc: #3a3a86;
 }
 .sky[data-phase='between'] {
 	--sa: #05061a;

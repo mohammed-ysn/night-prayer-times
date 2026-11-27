@@ -36,10 +36,6 @@
 	background: var(--lamp);
 	box-shadow: 0 0 10px rgba(255, 210, 138, 0.5);
 }
-.sk-choice-half {
-	opacity: 0.4;
-	box-shadow: none;
-}
 .sk-hit {
 	display: flex;
 	flex-direction: column;
@@ -136,6 +132,24 @@
 }
 .sk-lamps li[data-passed] .sk-lamp::before {
 	opacity: 0.8;
+}
+/* Another opinion's end of Isha: a small unlabelled tick on the bar. Tap target stays full-size. */
+.sk-lamps li[data-secondary] .sk-lamp {
+	width: 5px;
+	height: 5px;
+	margin: 2px 0 4px;
+	opacity: 0.7;
+}
+.sk-lamps li[data-secondary] .sk-lamp::before {
+	inset: -8px;
+}
+.sk-lamps li[data-secondary] .sk-name,
+.sk-lamps li[data-secondary] time {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
 }
 .sk-name {
 	font-weight: 600;

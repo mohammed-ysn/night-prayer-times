@@ -1,6 +1,6 @@
 # Night Prayer Times
 
-A calculator for Islamic night prayer times. Automatically fetches today's Maghrib and tomorrow's Fajr for London, then calculates the end of Isha and the start of the last third of the night.
+A calculator for Islamic night prayer times. Automatically fetches today's Maghrib and tomorrow's Fajr for London, then calculates the end of Isha (the middle of the night, with ⅓ shown as another opinion) and the start of the last third of the night.
 
 ## Development
 

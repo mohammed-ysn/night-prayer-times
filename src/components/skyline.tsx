@@ -72,17 +72,10 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 								style={{ left: `${night.windows.start * 100}%`, right: 0 }}
 							/>
 							<span
-								className="sk-choice sk-choice-half"
-								style={{
-									left: `${night.windows.start * 100}%`,
-									width: `${(night.windows.half - night.windows.start) * 100}%`
-								}}
-							/>
-							<span
 								className="sk-choice"
 								style={{
 									left: `${night.windows.start * 100}%`,
-									width: `${(night.windows.third - night.windows.start) * 100}%`
+									width: `${(night.windows.half - night.windows.start) * 100}%`
 								}}
 							/>
 						</div>
@@ -91,14 +84,20 @@ export function Skyline({ night, now, status, header }: SkylineProps) {
 								// Marks closer than a label's width put their text above the lamp instead.
 								const prev = all
 									.slice(0, i)
+									.filter((p) => !p.secondary)
 									.reverse()
 									.find((p) => !flipped.has(p.key));
-								const flip = prev !== undefined && m.pos - prev.pos < 0.2 && i !== all.length - 1;
+								const flip =
+									!m.secondary &&
+									prev !== undefined &&
+									m.pos - prev.pos < 0.2 &&
+									i !== all.length - 1;
 								if (flip) flipped.add(m.key);
 								return (
 									<li
 										key={m.key}
 										aria-current={m.next ? 'true' : undefined}
+										data-secondary={m.secondary ? '' : undefined}
 										data-passed={now >= m.time ? '' : undefined}
 										data-edge={i === 0 ? 'start' : i === all.length - 1 ? 'end' : undefined}
 										data-flip={flip ? '' : undefined}

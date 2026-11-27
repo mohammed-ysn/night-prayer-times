@@ -1,6 +1,6 @@
 import { formatTime, type PrayerTimes } from '@/lib/time';
 
-export type Phase = 'before' | 'isha-third' | 'isha-half' | 'between' | 'last' | 'after';
+export type Phase = 'before' | 'isha' | 'between' | 'last' | 'after';
 
 export type MarkKey = 'maghrib' | 'isha' | 'third' | 'half' | 'last' | 'fajr';
 
@@ -12,6 +12,8 @@ export interface Mark {
 	pos: number;
 	/** The mark the countdown is running to. */
 	next?: boolean;
+	/** Shown as a small tick with no label, and never the countdown target. */
+	secondary?: boolean;
 }
 
 interface Step {
@@ -38,21 +40,16 @@ export function getNight(times: PrayerTimes, now: Date) {
 	];
 	if (times.ishaTime) {
 		steps.push({
-			phase: 'isha-third',
+			phase: 'isha',
 			end: times.ishaTime,
 			eyebrow: 'Isha begins in'
 		});
 	}
 	steps.push(
 		{
-			phase: 'isha-third',
-			end: times.endOfIshaThird,
-			eyebrow: 'Isha ends (⅓) in'
-		},
-		{
-			phase: 'isha-half',
+			phase: 'isha',
 			end: times.endOfIsha,
-			eyebrow: 'Isha ends (½) in'
+			eyebrow: 'Isha ends in'
 		},
 		{
 			phase: 'between',
@@ -81,21 +78,21 @@ export function getNight(times: PrayerTimes, now: Date) {
 	base.push(
 		{
 			key: 'third',
-			label: 'Isha ⅓ end',
+			label: 'Isha ends (⅓)',
 			time: times.endOfIshaThird,
-			pos: at(times.endOfIshaThird)
+			pos: at(times.endOfIshaThird),
+			secondary: true
 		},
-		{ key: 'half', label: 'Isha ½ end', time: times.endOfIsha, pos: at(times.endOfIsha) },
+		{ key: 'half', label: 'Isha ends', time: times.endOfIsha, pos: at(times.endOfIsha) },
 		{ key: 'last', label: 'Last third', time: times.lastThird, pos: at(times.lastThird) },
 		{ key: 'fajr', label: 'Fajr', time: times.fajrTime, pos: 1 }
 	);
-	const nextKey = base.find((m) => now < m.time)?.key;
+	const nextKey = base.find((m) => !m.secondary && now < m.time)?.key;
 	const marks = base.map((m) => ({ ...m, next: m.key === nextKey }));
 
-	// Where Isha's two windows sit along the night. Choice: start to ⅓ or ½. Permissible: to Fajr.
+	// Where Isha's two windows sit along the night. Choice: start to ½. Permissible: to Fajr.
 	const windows = {
 		start: times.ishaTime ? at(times.ishaTime) : 0,
-		third: at(times.endOfIshaThird),
 		half: at(times.endOfIsha)
 	};
 

@@ -32,21 +32,13 @@ const PALETTES: Record<Phase, Palette> = {
 		stars: 0.15,
 		lights: 0.15
 	},
-	'isha-third': {
+	isha: {
 		top: [0.03, 0.03, 0.12],
 		mid: [0.12, 0.1, 0.33],
 		horiz: [0.45, 0.24, 0.42],
 		scatter: [0.85, 0.45, 0.6],
 		stars: 0.65,
 		lights: 0.9
-	},
-	'isha-half': {
-		top: [0.015, 0.02, 0.09],
-		mid: [0.06, 0.07, 0.28],
-		horiz: [0.2, 0.2, 0.5],
-		scatter: [0.3, 0.3, 0.75],
-		stars: 1,
-		lights: 1
 	},
 	between: {
 		top: [0.006, 0.009, 0.05],

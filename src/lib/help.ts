@@ -21,12 +21,12 @@ export const MARK_HELP: Record<MarkKey, Help> = {
 	},
 	third: {
 		title: 'Isha ends (⅓)',
-		body: 'One opinion: the time of choice for Isha lasts until a third of the night has passed, counting from Maghrib to Fajr.',
+		body: 'Another opinion: the time of choice for Isha lasts until a third of the night has passed, counting from Maghrib to Fajr.',
 		note: ISHA_NOTE
 	},
 	half: {
-		title: 'Isha ends (½)',
-		body: 'The other opinion: the time of choice for Isha lasts until the middle of the night, halfway from Maghrib to Fajr.',
+		title: 'Isha ends',
+		body: 'The time of choice for Isha lasts until the middle of the night, halfway from Maghrib to Fajr.',
 		note: ISHA_NOTE
 	},
 	last: {
@@ -43,7 +43,7 @@ export const WINDOWS_HELP = {
 	title: "Isha's two times",
 	choice: {
 		name: 'Time of choice (ikhtiyār)',
-		body: "From Isha's start until ⅓ or ½ of the night, depending on the opinion. Better and more rewarding to pray within it."
+		body: "From Isha's start until the middle of the night. Another opinion ends it at ⅓, shown as a small tick. Better and more rewarding to pray within it."
 	},
 	permissible: {
 		name: 'Time of permissibility (jawāz)',
